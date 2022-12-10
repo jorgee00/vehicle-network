@@ -1,0 +1,42 @@
+{
+    "$schema": "http://json-schema.org/schema",
+    "$id":"version_info.json",
+    "title":"Información de la versión",
+    "description":"Este activo es generado por los fabricantes de OEM para mostrar una descripción de la versión de software",
+    "type":"object",
+    "properties": {
+        "id_documento":{
+            "description":"Este campo representa el identificador de este documento",
+            "type":"string"
+        },
+        "version":{
+            "description":"Este campo representa el identificador de la versión de software generada",
+            "type":"string"
+        },
+        "integrity_validation": {
+            "description":"Este campo representa el hash de una firma que indica la integridad de este software",
+            "type":"string"
+        },
+        "RXSWIN":{
+            "description":"Este campo representa el identificador RXSWIN de este software",
+            "type":"string"
+        },
+        "updated_systems":{
+            "description":"Este campo representa un listado que contiene los sistemas implicados en la actualización de software",
+            "type":"array",
+            "items": {
+                "type":"object",
+                "properties": {
+                    "id_sistema":{
+                        "description":"Este campo representa el identificador del sistema que se ha actualizado en esta versión",
+                        "type":"string"
+                    },
+                    "description_of_update":{
+                        "description":"Este campo indica qué se ha hecho en esta versión de la actualización del sistema",
+                        "type":"string"
+                    }
+                }
+            }
+        }
+    }
+}

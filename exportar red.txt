@@ -1,0 +1,28 @@
+export MICROFAB_CONFIG='{
+    "port": 8080,
+    "endorsing_organizations":[
+        {
+            "name": "OEMManufacturerOrg"
+        },
+        {
+            "name": "HomologatorOrg"
+        },
+        {
+            "name": "VehicleManufacturerOrg"
+        },
+        {
+            "name": "InspectorOrg"
+        }
+    ],
+    "channels":[
+        {
+            "name": "channel1",
+            "endorsing_organizations":[
+                "OEMManufacturerOrg",
+                "HomologatorOrg",
+                "VehicleManufacturerOrg",
+                "InspectorOrg"
+            ]
+        }
+    ]
+}'

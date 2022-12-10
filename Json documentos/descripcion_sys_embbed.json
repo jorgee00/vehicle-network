@@ -1,0 +1,83 @@
+{
+    "$schema": "http://json-schema.org/schema",
+    "$id":"descripcion_sys_embbed.json",
+    "title":"Descripción del sistema embebido",
+    "description":"Este activo es generado por los fabricantes de OEM cuando crean un nuevo sistema embebido o actualizan uno previo",
+    "type":"object",
+    "properties": {
+        "id": {
+            "description":"Identificador del documento",
+            "type":"string"
+        },
+        "nombre": {
+            "description":"Nombre por el que se conoce a este sistema embebido",
+            "type":"string"
+        },
+        "fecha": {
+            "description":"Fecha en la que ha sido emitido este documento",
+            "type":"string"
+        },
+        "id_fabric":{
+            "description":"Identificador del fabricante de OEM que ha creado el sistema",
+            "type":"string"
+        },
+        "version": {
+            "description":"Identificador de la versión de este sistema",
+            "type":"string"
+        },
+        "hw_elem":{
+            "description":"Listado de los componentes de hardware que contiene este sistema embebido",
+            "type":"array",
+            "items":{
+                "type":"object",
+                "properties":{
+                    "num_modelo":{
+                        "description":"Identificador del elemento hardware",
+                        "type":"string"
+                    },
+                    "nombre_coloquial": {
+                        "description":"Nombre por el que se conoce a este elemento",
+                        "type":"string"
+                    },
+                    "version":{
+                        "description":"Identificador de la versión de este elemento",
+                        "type":"string"
+                    },
+                    "fecha":{
+                        "description":"Fecha de creación de este componente",
+                        "type":"string"
+                    }
+                }
+            }
+        },
+        "sw_elem":{
+            "description":"Listado de los componentes de software que contiene este sistema embebido",
+            "type":"array",
+            "items":{
+                "type":"object",
+                "properties":{
+                    "num_modelo":{
+                        "description":"Identificador del elemento hardware",
+                        "type":"string"
+                    },
+                    "nombre_coloquial": {
+                        "description":"Nombre por el que se conoce a este elemento",
+                        "type":"string"
+                    },
+                    "version":{
+                        "description":"Identificador de la versión de este elemento",
+                        "type":"string"
+                    },
+                    "fecha":{
+                        "description":"Fecha de creación de este componente",
+                        "type":"string"
+                    },
+                    "decission_document_id":{
+                        "description":"Referencia al documento en el que se determina si esta actualización es mayor (obligatoria) o menor (recomendada)",
+                        "type":"string"
+                    }
+                }
+            }
+        }
+    }
+}

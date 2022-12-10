@@ -1,0 +1,124 @@
+{
+    "$schema": "http://json-schema.org/schema",
+    "$id":"decision_tipo_update.json",
+    "title":"Evaluación del tipo de actualización",
+    "description":"Este activo es generado por los ",
+    "type":"object",
+    "properties": {
+        "id_doc":{
+            "description":"Identificador del documento de decisión del tipo de actualización",
+            "type":"string"
+        },
+        "fecha":{
+            "description": "Fecha de emisión del documento",
+            "type":"string"
+        },
+        "id_oem_manuf": {
+            "description": "Identificador del fabricante de OEM que genera este documento",
+            "type":"string"
+        },
+        "update_type_decission":{
+            "description": "Resultado del análisis del tipo de actualización",
+            "type":"string",
+            "values":["recommendation","obligation"]
+        },
+        "quality_controls":{
+            "description": "Controles de calidad por los que va a pasar dicha actualización",
+            "type":"array",
+            "items": {
+                "type":"object",
+                "properties": {
+                    "id_control": {
+                        "description": "Identificador del control de calidad empleado",
+                        "type":"string"
+                    },
+                    "description": {
+                        "description": "Explicación de los puntos por los que va a pasar este control de calidad",
+                        "type":"string"
+                    }
+                }
+            }
+        },
+        "changes_evaluation":{
+            "description": "Evaluación de lso cambios que se van a llevar a cabo en dicha actualización",
+            "type":"array",
+            "items": {
+                "type":"object",
+                "properties": {
+                    "name_of_change": {
+                        "description": "Nombre del cambio que se va a aplicar",
+                        "type":"string"
+                    },
+                    "description": {
+                        "description": "Explicación de dicho cambio",
+                        "type":"string"
+                    },
+                    "observaciones": {
+                        "description": "Detalles observados a la hora de llevar a cabo el cambio en el software",
+                        "type":"string"
+                    }
+                }
+            }
+        },
+        "regulation_impact_evaluation":{
+            "description": "Análisis del impacto en la regulación actual de esta actualización",
+            "type":"array",
+            "items": {
+                "type":"object",
+                "properties": {
+                    "id_rule": {
+                        "description": "Identificador de la regla afectada",
+                        "type":"string"
+                    },
+                    "impact": {
+                        "description": "Explicación de los puntos de este reglamento a los que afecta la actualización",
+                        "type":"string"
+                    },
+                    "conclusions": {
+                        "description": "Resumen de los resultados de aplicar dicho análisis al reglamento",
+                        "type":"string"
+                    }
+                }
+            }
+        },
+        "modifications_on_system":{
+            "description": "Listado de las modificaciones que se van a llevar a cabo en el sistema",
+            "type":"array",
+            "items": {
+                "type":"object",
+                "properties": {
+                    "modification_name": {
+                        "description": "Nombre por el que se conoce a la modificación",
+                        "type":"string"
+                    },
+                    "description": {
+                        "description": "Explicación de los puntos por los que va a pasar dicha modificación",
+                        "type":"string"
+                    }      
+                }
+            }
+        },
+        "changes_in_functionality":{
+            "description": "Listado de los cambios en la funcionalidad que va a incluir esta actualización",
+            "type":"array",
+            "items": {
+                "type":"object",
+                "properties": {
+                    "name_of_functionality": {
+                        "description": "Identificador de la funcionalidad que va a ser modificada",
+                        "type":"string"
+                    },
+                    "description": {
+                        "description": "Explicación del cambio que va a sufrir la funcionalidad",
+                        "type":"string"
+                    },
+                    "change_applied": {
+                        "description": "Tipo de cambio que va a tener esta actualización",
+                        "type":"string",
+                        "values":["Nueva", "Eliminada", "Modificada"]
+                    }
+                }
+            }
+        }
+    }
+}

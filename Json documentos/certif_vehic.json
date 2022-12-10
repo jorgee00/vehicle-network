@@ -1,0 +1,29 @@
+{
+    "$schema": "http://json-schema.org/schema",
+    "$id":"certif_vehic.json",
+    "title":"Certificación de un vehículo",
+    "description":"Este activo se manda a los fabricantes de vehículos cuando un nuevo vehículo ha sido aprobado por los homologadores",
+    "type":"object",
+    "properties": {
+        "ref_doc_descripcion": {
+            "description":"Este campo hace referencia al documento de descripción del vehículo generado por el fabricante del vehículo",
+            "type":"string"
+        },
+        "id_homologador": {
+            "description":"Identificador del homologador que emite el documento del certificado",
+            "type":"string"
+        },
+        "id_documento":{
+            "description":"Identificador del certificado",
+            "type":"string"
+        },
+        "fecha":{
+            "description":"Fecha de emisión del certificado",
+            "type":"string"
+        },
+        "firma":{
+            "description":"Hash de la firma digital del certificado",
+            "type":"string"
+        }
+    } 
+}

@@ -1,0 +1,7 @@
+../../build/bin/configtxgen -profile FourOrgsTradeOrdererGenesis -channelID trade-sys-channel -outputBlock ./channel-artifacts/genesis.block
+../../build/bin/configtxgen -profile FourOrgsVehicleChannel -outputCreateChannelTx ./channel-artifacts/tradechannel/channel.tx -channelID tradechannel
+
+../../build/bin/configtxgen -profile FourOrgsVehicleChannel -outputAnchorPeersUpdate ./channel-artifacts/tradechannel/OEMManufacturerOrgMSPanchors.tx -channelID tradechannel -asOrg OEMManufacturerOrg
+../../build/bin/configtxgen -profile FourOrgsVehicleChannel -outputAnchorPeersUpdate ./channel-artifacts/tradechannel/HomologatorOrgMSPanchors.tx -channelID tradechannel -asOrg HomologatorOrg
+../../build/bin/configtxgen -profile FourOrgsVehicleChannel -outputAnchorPeersUpdate ./channel-artifacts/tradechannel/VehicleManufacturerOrgMSPanchors.tx -channelID tradechannel -asOrg VehicleManufacturerOrg
+../../build/bin/configtxgen -profile FourOrgsVehicleChannel -outputAnchorPeersUpdate ./channel-artifacts/tradechannel/InspectorOrgMSPanchors.tx -channelID tradechannel -asOrg InspectorOrg

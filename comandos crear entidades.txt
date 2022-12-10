@@ -1,0 +1,11 @@
+fabric-ca-client register --id.name oemManuf --id.secret pwd1 --id.type user --id.affiliation OEMManufacturerOrgMSP --id.attrs "tradelimit=1000:ecert,hf.Affiliation=OEMManufacturerOrgMSP:ecert"
+fabric-ca-client enroll -u http://oemManuf:pwd1@ca:7054 --enrollment.attrs "tradelimit,email:opt" --mspdir oemManuf
+
+fabric-ca-client register --id.name homologator --id.secret pwd1 --id.type user --id.affiliation HomologatorOrgMSP --id.attrs "tradelimit=1000:ecert,hf.Affiliation=HomologatorOrgMSP:ecert"
+fabric-ca-client enroll -u http://homologator:pwd1@ca:7054 --enrollment.attrs "tradelimit,email:opt" --mspdir homologator
+
+fabric-ca-client register --id.name vehicManuf --id.secret pwd1 --id.type user --id.affiliation VehicleManufacturerOrgMSP --id.attrs "tradelimit=1000:ecert,hf.Affiliation=VehicleManufacturerOrgMSP:ecert"
+fabric-ca-client enroll -u http://vehicManuf:pwd1@ca:7054 --enrollment.attrs "tradelimit,email:opt" --mspdir vehicManuf
+
+fabric-ca-client register --id.name inspector --id.secret pwd1 --id.type user --id.affiliation InspectorOrgMSP --id.attrs "tradelimit=1000:ecert,hf.Affiliation=InspectorOrgMSP:ecert"
+fabric-ca-client enroll -u http://inspector:pwd1@ca:7054 --enrollment.attrs "tradelimit,email:opt" --mspdir inspector

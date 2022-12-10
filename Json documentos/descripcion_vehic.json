@@ -1,0 +1,65 @@
+{
+    "$schema": "http://json-schema.org/schema",
+    "$id":"descripcion_vehic.json",
+    "title":"Descripción del vehículo",
+    "description":"Este activo es generado por los fabricantes de vehículos cuando crean un nuevo modelo de vehículo autónomo",
+    "type":"object",
+    "properties": {
+        "id_doc":{
+            "description":"Este campo es el identificador del documento",
+            "type":"string"
+        },
+        "codif_modelo":{
+            "description":"Este campo identifica un vehículo de forma única",
+            "type":"object",
+            "properties": {
+                "marca": {
+                    "description":"Este campo indica la marca que fabrica el vehículo",
+                    "type":"string"
+                },
+                "modelo":{
+                    "description":"Este campo indica el modelo del vehículo dentro de la marca que lo fabrica",
+                    "type":"string"
+                },
+                "id_vehículo":{
+                    "description":"Este campo es el identificador único del vehículo al que se refiere el documento",
+                    "type":"string"
+                }
+            }
+        },
+        "sistemas":{
+            "description":"Este campo es un listado de los sistemas que contiene dicho vehículo",
+            "type":"array",
+            "items": {
+                "type":"object",
+                "properties":{
+                    "nombre":{
+                        "description":"Este campo simboliza el nombre por el que se conoce al sistema",
+                        "type":"string"
+                    },
+                    "manager":{
+                        "description":"Este campo representa el manager que interactúa con cierto sistema",
+                        "type":"object",
+                        "properties": {
+                            "identificador":{
+                                "description":"Este campo representa el identificador del manager del sistema",
+                                "type":"string"
+                            },
+                            "nombre":{
+                                "description":"Este campo representa el nombre por el cual se conoce al manager del sistema",
+                                "type":"string"
+                            },
+                            "sistemas_controlados":{
+                                "description":"Este campo representa una lista de los sistemas embebidos controlados por el manager",
+                                "type":"array",
+                                "items": {
+                                    "type":"string"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

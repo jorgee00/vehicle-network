@@ -1,0 +1,46 @@
+{
+    "$schema": "http://json-schema.org/schema",
+    "$id":"aviso_actualizacion.json",
+    "title":"Aviso de actualizacion",
+    "description":"Este activo se manda a los fabricantes de vehículo que emplean el sistema embebido del que se ha actualizado la parte de software",
+    "type":"object",
+    "properties": {
+        "id_documento":{
+            "description":"Identificador del documento de aviso a los fabricantes",
+            "type":"string"
+        },
+        "id_fab_vehic":{
+            "description":"Identificador del fabricante de vehículos al que se dirige el documento",
+            "type":"string"
+        },
+        "systems_to_update":{
+            "description":"Listado de los sistemas que tienen actualización con su respectivo tipo de obligación de actualización",
+            "type":"array",
+            "items":{
+                "type":"object",
+                "properties":{
+                    "id_emb_sys":{
+                        "description":"Identificador del sistema embebido implicado en la actualización de software",
+                        "type":"string"
+                    },
+                    "description":{
+                        "description":"Descripción de la actualización de software",
+                        "type":"string"
+                    },
+                    "type_of_update":{
+                        "description":"Nivel de obligatoriedad de la actualización",
+                        "type":"string",
+                        "values":["recommendation","obligation"]
+                    }
+                }
+            }
+            
+        }
+           ,
+        "date":{
+            "description":"Fecha de emisión del documento",
+            "type":"string"
+        }
+    }
+    
+}

@@ -1,0 +1,135 @@
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+version: '2'
+
+volumes:
+  orderer.trade.com:
+  peer0.oemmanuf.trade.com:
+  peer0.homologatororg.trade.com:
+  peer0.vehiclemanuf.trade.com:
+  peer0.inspectororg.trade.com:
+  ca.oemmanuf.trade.com:
+  ca.homologatororg.trade.com:
+  ca.vehiclemanuf.trade.com:
+  ca.inspectororg.trade.com:
+
+networks:
+  trade:
+services:
+  oemmanuf-ca:
+    image: hyperledger/fabric-ca:$CA_IMAGE_TAG
+    platform: $PLATFORM
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=ca-oemmanuf
+      - FABRIC_CA_SERVER_TLS_ENABLED=true
+      - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.oemmanuf.trade.com-cert.pem
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/priv_sk
+    ports:
+      - "7054:7054"
+    command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.oemmanuf.trade.com-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/priv_sk -b admin:adminpw -d'
+    volumes:
+      - ./crypto-config/peerOrganizations/oemmanuf.trade.com/ca/:/etc/hyperledger/fabric-ca-server-config
+      - ca.oemmanuf.trade.com:/etc/hyperledger/fabric-ca-server
+    container_name: ca.oemmanuf.trade.com
+    networks:
+      - trade
+
+  homologatororg-ca:
+    image: hyperledger/fabric-ca:$CA_IMAGE_TAG
+    platform: $PLATFORM
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=ca-homologatororg
+      - FABRIC_CA_SERVER_TLS_ENABLED=true
+      - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.homologatororg.trade.com-cert.pem
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/priv_sk
+    ports:
+      - "8054:8054"
+    command: sh -c 'fabric-ca-server start --port 8054 --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.homologatororg.trade.com-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/priv_sk -b admin:adminpw -d'
+    volumes:
+      - ./crypto-config/peerOrganizations/homologatororg.trade.com/ca/:/etc/hyperledger/fabric-ca-server-config
+      - ca.homologatororg.trade.com:/etc/hyperledger/fabric-ca-server
+    container_name: ca.homologatororg.trade.com
+    networks:
+      - trade
+
+  vehiclemanuf-ca:
+    image: hyperledger/fabric-ca:$CA_IMAGE_TAG
+    platform: $PLATFORM
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=ca-vehiclemanuf
+      - FABRIC_CA_SERVER_TLS_ENABLED=true
+      - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.vehiclemanuf.trade.com-cert.pem
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/priv_sk
+    ports:
+      - "9054:9054"
+    command: sh -c 'fabric-ca-server start --port 9054 --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.vehiclemanuf.trade.com-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/priv_sk -b admin:adminpw -d'
+    volumes:
+      - ./crypto-config/peerOrganizations/vehiclemanuf.trade.com/ca/:/etc/hyperledger/fabric-ca-server-config
+      - ca.vehiclemanuf.trade.com:/etc/hyperledger/fabric-ca-server
+    container_name: ca.vehiclemanuf.trade.com
+    networks:
+      - trade
+
+  inspectororg-ca:
+    image: hyperledger/fabric-ca:$CA_IMAGE_TAG
+    platform: $PLATFORM
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=ca-inspectororg
+      - FABRIC_CA_SERVER_TLS_ENABLED=true
+      - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.inspectororg.trade.com-cert.pem
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/priv_sk
+    ports:
+      - "10054:10054"
+    command: sh -c 'fabric-ca-server start --port 10054 --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.inspectororg.trade.com-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/priv_sk -b admin:adminpw -d'
+    volumes:
+      - ./crypto-config/peerOrganizations/inspectororg.trade.com/ca/:/etc/hyperledger/fabric-ca-server-config
+      - ca.inspectororg.trade.com:/etc/hyperledger/fabric-ca-server
+    container_name: ca.inspectororg.trade.com
+    networks:
+      - trade
+
+  orderer.trade.com:
+    extends:
+      file:   base/docker-compose-base.yaml
+      service: orderer.trade.com
+    container_name: orderer.trade.com
+    networks:
+      - trade
+
+  peer0.oemmanuf.trade.com:
+    container_name: peer0.oemmanuf.trade.com
+    extends:
+      file:  base/docker-compose-base.yaml
+      service: peer0.oemmanuf.trade.com
+    networks:
+      - trade
+
+  peer0.homologatororg.trade.com:
+    container_name: peer0.homologatororg.trade.com
+    extends:
+      file:  base/docker-compose-base.yaml
+      service: peer0.homologatororg.trade.com
+    networks:
+      - trade
+
+  peer0.vehiclemanuf.trade.com:
+    container_name: peer0.vehiclemanuf.trade.com
+    extends:
+      file:  base/docker-compose-base.yaml
+      service: peer0.vehiclemanuf.trade.com
+    networks:
+      - trade
+
+  peer0.inspectororg.trade.com:
+    container_name: peer0.inspectororg.trade.com
+    extends:
+      file:  base/docker-compose-base.yaml
+      service: peer0.inspectororg.trade.com
+    networks:
+      - trade

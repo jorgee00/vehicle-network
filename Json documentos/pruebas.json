@@ -1,0 +1,57 @@
+{
+    "$schema": "http://json-schema.org/schema",
+    "$id":"pruebas.json",
+    "title":"Documento de descripción de pruebas",
+    "description":"Este activo es generado por los fabricantes de OEM para que el homologador pueda comprobar que es válido para enviar el certificado",
+    "type":"object",
+        "properties": {
+            "id_prueba": {
+                "description":"Este campo representa el identificador de dicha prueba",
+                "type":"string"
+            },
+            "id_documento": {
+                "description":"Este campo representa el identificador de este documento",
+                "type":"string"
+            },
+            "id_oem_manuf":{
+                "description":"Este campo representa el identificador del fabricante de OEM que ha creado la actualización",
+                "type":"string"
+            },
+            "id_embbed_sys":{
+                "description":"Este campo representa el identificador del sistema embebido al que pertenece la actualización",
+                "type":"string"
+            },
+            "sistemas_probados":{
+                "description":"Este campo enumera los sistemas que se van a probar en dicho test",
+                "type":"array",
+                "items": {
+                    "type":"string"
+                }
+            },
+            "tipo_de_prueba":{
+                "description":"Este campo representa el tipo de prueba que se va a llevar a cabo",
+                "type":"string",
+                "values":["fisica", "simulada"]
+            },
+            "description": {
+                "description":"Este campo indica qué se va a hacer en esta prueba",
+                "type":"string"
+            },
+            "expected_results": {
+                "description":"Este campo indica qué resultados se esperan obtener de la prueba que se va a realizar",
+                "type":"string"
+            },
+            "obtained_results":{
+                "description":"Este campo indica qué resultados se han obtenido en la prueba",
+                "type":"string"
+            },
+            "proof_validation":{
+                "description":"Este campo indica cómo se ha validado la prueba que se ha realizado",
+                "type":"string"
+            },
+            "date":{
+                "description":"Este campo representa la fecha en la que se ha realizado la prueba",
+                "type":"string"
+            }
+        }
+}

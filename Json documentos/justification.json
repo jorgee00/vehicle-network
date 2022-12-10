@@ -1,0 +1,35 @@
+{
+    "$schema": "http://json-schema.org/schema",
+    "$id":"justification.json",
+    "title":"Justificación de rechazo o aceptación",
+    "description":"Este activo se manda a los fabricantes de vehículo o a los fabricantes de OEM para darles una respuesta acerca de su solicitud de aprobación",
+    "type":"object",
+    "properties": {
+        "id_documento":{
+            "description":"Identificador del documento de aviso a los fabricantes",
+            "type":"string"
+        },
+        "id_fab":{
+            "description":"Identificador del fabricante al que se dirige el documento",
+            "type":"string"
+        },
+        "id_doc_descripcion":{
+            "description":"Identificador del documento de descripción del activo del que fue solicitada la homologación",
+            "type":"string"
+        },
+        "decission":{
+            "description":"Resultado de la evaluación por parte del homologador para aceptar o rechazar la homologación del activo",
+            "type":"string",
+            "values":["Approved","Rejected"]
+        },
+        "justification":{
+            "description":"Explicación de la decisión tomada en el campo anterior",
+            "type":"string"
+        },
+        "date":{
+            "description":"Fecha de emisión del documento",
+            "type":"string"
+        }
+    }
+    
+}

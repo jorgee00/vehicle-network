@@ -1,0 +1,108 @@
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+version: '2'
+
+services:
+
+  orderer.trade.com:
+    container_name: orderer.trade.com
+    extends:
+      file: peer-base.yaml
+      service: orderer-base
+    volumes:
+    - ../channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+    - ../crypto-config/ordererOrganizations/trade.com/orderers/orderer.trade.com/msp:/var/hyperledger/orderer/msp
+    - ../crypto-config/ordererOrganizations/trade.com/orderers/orderer.trade.com/tls/:/var/hyperledger/orderer/tls
+    - orderer.trade.com:/var/hyperledger/production/orderer
+    ports:
+      - 7050:7050
+
+  peer0.oemmanuf.trade.com:
+    container_name: peer0.oemmanuf.trade.com
+    extends:
+      file: peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer0.oemmanuf.trade.com
+      - CORE_PEER_ADDRESS=peer0.oemmanuf.trade.com:7051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+      - CORE_PEER_CHAINCODEADDRESS=peer0.oemmanuf.trade.com:7052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.oemmanuf.trade.com:7051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.oemmanuf.trade.com:7051
+      - CORE_PEER_LOCALMSPID=OEMManufacturerOrgMSP
+    volumes:
+        - $UNIX_SOCK:/host/var/run/docker.sock
+        - ../crypto-config/peerOrganizations/oemmanuf.trade.com/peers/peer0.oemmanuf.trade.com/msp:/etc/hyperledger/fabric/msp
+        - ../crypto-config/peerOrganizations/oemmanuf.trade.com/peers/peer0.oemmanuf.trade.com/tls:/etc/hyperledger/fabric/tls
+        - peer0.oemmanuf.trade.com:/var/hyperledger/production
+    ports:
+      - 7051:7051
+
+  peer0.homologatororg.trade.com:
+    container_name: peer0.homologatororg.trade.com
+    extends:
+      file: peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer0.homologatororg.trade.com
+      - CORE_PEER_ADDRESS=peer0.homologatororg.trade.com:8051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:8051
+      - CORE_PEER_CHAINCODEADDRESS=peer0.homologatororg.trade.com:7052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.homologatororg.trade.com:8051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.homologatororg.trade.com:8051
+      - CORE_PEER_LOCALMSPID=HomologatorOrgMSP
+    volumes:
+        - $UNIX_SOCK:/host/var/run/docker.sock
+        - ../crypto-config/peerOrganizations/homologatororg.trade.com/peers/peer0.homologatororg.trade.com/msp:/etc/hyperledger/fabric/msp
+        - ../crypto-config/peerOrganizations/homologatororg.trade.com/peers/peer0.homologatororg.trade.com/tls:/etc/hyperledger/fabric/tls
+        - peer0.homologatororg.trade.com:/var/hyperledger/production
+    ports:
+      - 8051:8051
+
+  peer0.vehiclemanuf.trade.com:
+    container_name: peer0.vehiclemanuf.trade.com
+    extends:
+      file: peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer0.vehiclemanuf.trade.com
+      - CORE_PEER_ADDRESS=peer0.vehiclemanuf.trade.com:9051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:9051
+      - CORE_PEER_CHAINCODEADDRESS=peer0.vehiclemanuf.trade.com:7052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.vehiclemanuf.trade.com:9051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.vehiclemanuf.trade.com:9051
+      - CORE_PEER_LOCALMSPID=VehicleManufacturerOrgMSP
+    volumes:
+        - $UNIX_SOCK:/host/var/run/docker.sock
+        - ../crypto-config/peerOrganizations/vehiclemanuf.trade.com/peers/peer0.vehiclemanuf.trade.com/msp:/etc/hyperledger/fabric/msp
+        - ../crypto-config/peerOrganizations/vehiclemanuf.trade.com/peers/peer0.vehiclemanuf.trade.com/tls:/etc/hyperledger/fabric/tls
+        - peer0.vehiclemanuf.trade.com:/var/hyperledger/production
+    ports:
+      - 9051:9051
+
+  peer0.inspectororg.trade.com:
+    container_name: peer0.inspectororg.trade.com
+    extends:
+      file: peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer0.inspectororg.trade.com
+      - CORE_PEER_ADDRESS=peer0.inspectororg.trade.com:10051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:10051
+      - CORE_PEER_CHAINCODEADDRESS=peer0.inspectororg.trade.com:7052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.inspectororg.trade.com:10051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.inspectororg.trade.com:10051
+      - CORE_PEER_LOCALMSPID=InspectorOrgMSP
+    volumes:
+        - $UNIX_SOCK:/host/var/run/docker.sock
+        - ../crypto-config/peerOrganizations/inspectororg.trade.com/peers/peer0.inspectororg.trade.com/msp:/etc/hyperledger/fabric/msp
+        - ../crypto-config/peerOrganizations/inspectororg.trade.com/peers/peer0.inspectororg.trade.com/tls:/etc/hyperledger/fabric/tls
+        - peer0.inspectororg.trade.com:/var/hyperledger/production
+    ports:
+      - 10051:10051
