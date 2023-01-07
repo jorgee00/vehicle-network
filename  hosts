@@ -1,0 +1,9 @@
+127.0.0.1 peer0.vehiclemanuf.trade.com 
+127.0.0.1 peer0.homologatororg.trade.com
+127.0.0.1 peer0.oemmanuf.trade.com
+127.0.0.1 peer0.inspectororg.trade.com
+
+127.0.0.1 ca.vehiclemanuf.trade.com 
+127.0.0.1 ca.homologatororg.trade.com
+127.0.0.1 ca.oemmanuf.trade.com
+127.0.0.1 ca.inspectororg.trade.com 
