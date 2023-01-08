@@ -1,10 +1,10 @@
 wget https://go.dev/dl/go1.19.4.linux-amd64.tar.gz
 rm -rf /usr/local/go && tar -C /usr/local -xzf go1.19.4.linux-amd64.tar.gz
 mkdir -p $HOME/go/src
-export PATH=$PATH:/usr/local/go/bin
-export GOPATH=$HOME/go
-export PATH=$PATH:$GOPATH/bin
-
+echo export PATH=$PATH:/usr/local/go/bin >> $HOME/.bashrc
+echo export GOPATH=$HOME/go >> $HOME/.bashrc
+echo export PATH=$PATH:$GOPATH/bin >> $HOME/.bashrc
+echo export $GOPATH/src/github.com/hyperledger/fabric/build/bin >> $HOME/.bashrc
 mkdir -p $GOPATH/src/github.com/hyperledger/
 
 sudo apt-get purge nodejs
