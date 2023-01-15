@@ -12,3 +12,4 @@ echo 127.0.0.1 ca.oemmanuf.trade.com >> /etc/hosts
 echo 127.0.0.1 ca.inspectororg.trade.com >> /etc/hosts
 
 cat /etc/hosts
+

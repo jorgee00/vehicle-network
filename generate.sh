@@ -9,10 +9,10 @@ configtxgen -profile FourOrgsTradeOrdererGenesis -channelID trade-sys-channel -o
 
 configtxgen -profile FourOrgsVehicleChannel -outputCreateChannelTx ./channel-artifacts/tradechannel/channel.tx -channelID tradechannel
 
-configtxgen -profile FourOrgsVehicleChannel -outputAnchorPeersUpdate ./channel-artifacts/tradechannel/OEMManufacturerOrgMSPanchor.tx -channelID tradechannel -asOrg OEMManufacturerOrg
+configtxgen -profile FourOrgsVehicleChannel -outputAnchorPeersUpdate ./channel-artifacts/tradechannel/OEMManufacturerOrgMSPanchors.tx -channelID tradechannel -asOrg OEMManufacturerOrg
 
-configtxgen -profile FourOrgsVehicleChannel -outputAnchorPeersUpdate ./channel-artifacts/tradechannel/HomologatorMSPanchor.tx -channelID tradechannel -asOrg HomologatorOrg
+configtxgen -profile FourOrgsVehicleChannel -outputAnchorPeersUpdate ./channel-artifacts/tradechannel/HomologatorOrgMSPanchors.tx -channelID tradechannel -asOrg HomologatorOrg
 
-configtxgen -profile FourOrgsVehicleChannel -outputAnchorPeersUpdate ./channel-artifacts/tradechannel/VehicleManufacturerMSPanchor.tx -channelID tradechannel -asOrg VehicleManufacturerOrg
+configtxgen -profile FourOrgsVehicleChannel -outputAnchorPeersUpdate ./channel-artifacts/tradechannel/VehicleManufacturerOrgMSPanchors.tx -channelID tradechannel -asOrg VehicleManufacturerOrg
 
-configtxgen -profile FourOrgsVehicleChannel -outputAnchorPeersUpdate ./channel-artifacts/tradechannel/InspectorOrgMSPanchor.tx -channelID tradechannel -asOrg InspectorOrg
+configtxgen -profile FourOrgsVehicleChannel -outputAnchorPeersUpdate ./channel-artifacts/tradechannel/InspectorOrgMSPanchors.tx -channelID tradechannel -asOrg InspectorOrg

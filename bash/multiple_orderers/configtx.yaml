@@ -21,7 +21,7 @@ Organizations:
         Name: TradeOrdererOrg
 
         # ID to load the MSP definition as
-        ID: TradeOrdererOrgMSP
+        ID: RegulatorOrgMSP
 
         # MSPDir is the filesystem path which contains the MSP configuration
         MSPDir: ../crypto-config/ordererOrganizations/trade.com/msp
@@ -32,13 +32,13 @@ Organizations:
         Policies:
             Readers:
                 Type: Signature
-                Rule: "OR('TradeOrdererOrgMSP.member')"
+                Rule: "OR('RegulatorOrgMSP.member')"
             Writers:
                 Type: Signature
-                Rule: "OR('TradeOrdererOrgMSP.member')"
+                Rule: "OR('RegulatorOrgMSP.member')"
             Admins:
                 Type: Signature
-                Rule: "OR('TradeOrdererOrgMSP.admin')"
+                Rule: "OR('RegulatorOrgMSP.admin')"
 
         OrdererEndpoints:
             - orderer.trade.com:7050

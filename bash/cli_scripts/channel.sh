@@ -23,11 +23,10 @@ verifyResult() {
   fi
 }
 
-exporterorg_PORT=7051
-importerorg_PORT=8051
-carrierorg_PORT=9051
-regulatororg_PORT=10051
-exportingentityorg_PORT=12051
+oemmanuf_PORT=7051
+homologatororg_PORT=8051
+vehiclemanuf_PORT=9051
+inspectororg_PORT=10051
 
 setEnvironment() {
   if [[ $# -lt 1 ]]
@@ -42,30 +41,26 @@ setEnvironment() {
     PEER=$2
   fi
   MSP=
-  if [[ "$ORG" == "exporterorg" ]]
+  if [[ "$ORG" == "oemmanuf" ]]
   then
-    MSP=ExporterOrgMSP
-    PORT=$exporterorg_PORT
-  elif [[ "$ORG" == "importerorg" ]]
+    MSP=OEMManufacturerOrgMSP
+    PORT=$oemmanuf_PORT
+  elif [[ "$ORG" == "homologatororg" ]]
   then
-    MSP=ImporterOrgMSP
-    PORT=$importerorg_PORT
+    MSP=HomologatorOrgMSP
+    PORT=$homologatororg_PORT
     if [[ "$PEER" == "peer1" ]]
     then
       PORT=11051
     fi
-  elif [[ "$ORG" == "carrierorg" ]]
+  elif [[ "$ORG" == "vehiclemanuf" ]]
   then
-    MSP=CarrierOrgMSP
-    PORT=$carrierorg_PORT
-  elif [[ "$ORG" == "regulatororg" ]]
+    MSP=VehicleManufacturerOrgMSP
+    PORT=$vehiclemanuf_PORT
+  elif [[ "$ORG" == "inspectororg" ]]
   then
-    MSP=RegulatorOrgMSP
-    PORT=$regulatororg_PORT
-  elif [[ "$ORG" == "exportingentityorg" ]]
-  then
-    MSP=ExportingEntityOrgMSP
-    PORT=$exportingentityorg_PORT
+    MSP=InspectorOrgMSP
+    PORT=$inspectororg_PORT
   else
     echo "Unknown Org: "$ORG
     exit 1
@@ -79,7 +74,7 @@ setEnvironment() {
 }
 
 createChannel() {
-  setEnvironment exporterorg
+  setEnvironment oemmanuf
 
   set -x
   fetchChannelConfig
@@ -136,12 +131,7 @@ joinChannelWithRetry() {
 }
 
 joinChannel() {
-  if [ "$NUM_ORGS_IN_CHANNEL" == "3" ]
-  then
-    ORG_LIST="exporterorg importerorg regulatororg"
-  else
-    ORG_LIST="exporterorg importerorg carrierorg regulatororg"
-  fi
+  ORG_LIST="oemmanuf homologatororg vehiclemanuf inspectororg"
   for org in $ORG_LIST; do
     joinChannelWithRetry $org
     echo "===================== peer0.${org}.trade.com joined channel '$CHANNEL_NAME' ===================== "
@@ -159,7 +149,7 @@ joinNewPeerToChannel() {
 # fetchOldestBlock <channel_id> <output_json>
 # Writes the oldest block for a given channel to a JSON file
 fetchOldestBlock() {
-  setEnvironment exporterorg
+  setEnvironment oemmanuf
 
   echo "Fetching the most recent configuration block for the channel"
   set -x
@@ -173,7 +163,7 @@ fetchOldestBlock() {
 # fetchChannelConfig <channel_id> <output_json>
 # Writes the current channel config for a given channel to a JSON file
 fetchChannelConfig() {
-  setEnvironment exporterorg
+  setEnvironment oemmanuf
 
   BLOCKFILE=$CHANNEL_NAME.block
   if [[ $# -eq 1 ]]
@@ -211,12 +201,7 @@ updateAnchorPeersForOrg() {
 
 # Set anchor peers for org in channel
 updateAnchorPeers() {
-  if [ "$NUM_ORGS_IN_CHANNEL" == "3" ]
-  then
-    ORG_LIST="exporterorg importerorg regulatororg"
-  else
-    ORG_LIST="exporterorg importerorg carrierorg regulatororg"
-  fi
+  ORG_LIST="oemmanuf homologatororg vehiclemanuf inspectororg"
   for org in $ORG_LIST; do
     updateAnchorPeersForOrg $org
     echo "===================== peer0.${org}.trade.com set as anchor in ${org} in channel '$CHANNEL_NAME' ===================== "
@@ -237,65 +222,6 @@ signConfigtxAsPeerOrg() {
   set +x
   cat log.txt
   verifyResult $res "Updating anchor peers for org '"$ORG"' failed"
-}
-
-# Upgrade channel configuration
-updateChannelConfiguration() {
-  # Delete old temp folder if it exists
-  TMPDIR=tmp_upgrade
-  rm -rf $TMPDIR
-
-  # Create temp folder for computations
-  mkdir $TMPDIR
-  cd $TMPDIR
-
-  # Get latest channel configuration block
-  fetchChannelConfig ${CHANNEL_NAME}_config_block.pb
-
-  # Convert config block (in protobuf format) to JSON format and extract the embedded config into a JSON file
-  configtxlator proto_decode --input ${CHANNEL_NAME}_config_block.pb --type common.Block | jq .data.data[0].payload.data.config > ${CHANNEL_NAME}_config.json
-
-  # Append the configuration of our new org to the above config
-  jq -s '.[0] * {"channel_group":{"groups":{"Application":{"groups": {"ExportingEntityOrg":.[1]}}}}}' ${CHANNEL_NAME}_config.json ../channel-artifacts/$CHANNEL_NAME/exportingEntityOrg.json > ${CHANNEL_NAME}_modified_config.json
-
-  # Convert config JSON to protobuf format
-  configtxlator proto_encode --input ${CHANNEL_NAME}_config.json --type common.Config --output ${CHANNEL_NAME}_config.pb
-
-  # Convert modified config JSON to protobuf format
-  configtxlator proto_encode --input ${CHANNEL_NAME}_modified_config.json --type common.Config --output ${CHANNEL_NAME}_modified_config.pb
-
-  # Compute delta (difference) between new config (with ExportingEntityOrg) and old config; this is the update we need to make to the channel
-  configtxlator compute_update --channel_id $CHANNEL_NAME --original ${CHANNEL_NAME}_config.pb --updated ${CHANNEL_NAME}_modified_config.pb --output exportingEntityOrg_update.pb
-
-  # Convert delta from protobuf to JSON format for ease of enveloping
-  configtxlator proto_decode --input exportingEntityOrg_update.pb --type common.ConfigUpdate | jq . > exportingEntityOrg_update.json
-
-  # Wrap the update in an envelope
-  echo '{"payload":{"header":{"channel_header":{"channel_id":"'$CHANNEL_NAME'", "type":2}},"data":{"config_update":'$(cat exportingEntityOrg_update.json)'}}}' | jq . > exportingEntityOrg_update_in_envelope.json
-
-  # Finally, convert this envelope into protobuf format for Fabric's consumption
-  configtxlator proto_encode --input exportingEntityOrg_update_in_envelope.json --type common.Envelope --output exportingEntityOrg_update_in_envelope.pb
-
-  # Get the config signed by a majority of orgs in the channel
-  if [ "$NUM_ORGS_IN_CHANNEL" == "3" ]
-  then
-    ORG_LIST="exporterorg regulatororg"
-  else
-    ORG_LIST="exporterorg importerorg carrierorg"
-  fi
-  for org in $ORG_LIST; do
-    signConfigtxAsPeerOrg $org exportingEntityOrg_update_in_envelope.pb
-    echo "===================== peer0.${org}.trade.com signed update for channel '$CHANNEL_NAME' ===================== "
-    echo
-  done
-
-  # Submit a channel configuration update transaction
-  set -x
-  peer channel update -f exportingEntityOrg_update_in_envelope.pb -c $CHANNEL_NAME -o orderer.trade.com:7050 --tls --cafile $ORDERER_CA --connTimeout 120s >&log.txt
-  res=$?
-  set +x
-  cat log.txt
-  verifyResult $res "Updating configuration for channel '"$CHANNEL_NAME"' failed"
 }
 
 # Update anchor peer for new organization by pushing a channel configuration update
@@ -386,12 +312,6 @@ elif [ "$1" == "joinnewpeer" ]
   echo "Having new peer join the channel..."
   joinNewPeerToChannel
   echo "========= Channel join completed for new peer =========== "
-elif [ "$1" == "update" ]
-  then
-  ## Update the channel configuration to add a new organization
-  echo "Updating the channel configuration to add ExportingEntityOrg..."
-  updateChannelConfiguration
-  echo "========= Channel update completed =========== "
 elif [ "$1" == "anchorneworg" ]
   then
   ## Set anchor peer for new org
