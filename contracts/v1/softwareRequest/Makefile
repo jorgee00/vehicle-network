@@ -19,7 +19,7 @@ $(DIST_DIR):
 build: $(DIST_DIR)
 	echo ">> Building chaincode"
 	docker run  --rm -v $(ROOT_DIR):/src -v $(DIST_DIR):/dist -w /src ${DOCKER_IMAGE} sh -c "$(BUILD_CMD)"
-
+	sudo chown -R $(USER) dist/
 .PHONY: package
 package: $(DIST_DIR)
 	echo ">> Packaging chaincode"
