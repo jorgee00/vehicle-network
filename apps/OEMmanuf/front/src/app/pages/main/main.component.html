@@ -1,1 +1,22 @@
-<p>main works!</p>
+<div class="container">
+    <app-header [header]="header"></app-header>
+    <div class="content">
+        <div class="table">
+            <thead>
+                <th class="type">Tipo</th>
+                <th class="name">Nombre</th>
+                <th class="software">Software Requerido</th>
+                <th class="status">Estado</th>
+            </thead>
+            <tbody>
+                <tr *ngFor="let elem of data">
+                    <td class="type">{{elem.type}}</td>
+                    <td class="name">{{elem.name}}</td>
+                    <td class="software">{{elem.software}}</td>
+                    <td class="status">{{elem.status}}</td>
+                </tr>
+            </tbody>
+        </div>
+    </div>
+    
+</div>

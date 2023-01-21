@@ -106,6 +106,7 @@ public class RegulatorController {
         @RequestMapping(value = "/login", method = RequestMethod.POST)
         public ResponseEntity<String> login(String username, String password, HttpServletResponse response) throws Exception {
                 try {
+                        System.out.println(new UsernamePasswordAuthenticationToken(username, password));
                         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
                 } catch(AuthenticationException ae) {
                         ae.printStackTrace();

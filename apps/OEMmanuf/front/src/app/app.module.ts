@@ -8,12 +8,14 @@ import { MainComponent } from './pages/main/main.component';
 import { CookieService } from 'ngx-cookie-service';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { HeaderComponent } from './shared/components/header/header.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
-    MainComponent
+    MainComponent,
+    HeaderComponent
   ],
   imports: [
     BrowserModule,

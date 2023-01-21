@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { FormGroup ,FormBuilder } from '@angular/forms';
 import { GlobalConstants } from 'src/app/shared/global-constants';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
+import { Router } from '@angular/router';
+
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -10,7 +12,10 @@ import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 export class LoginComponent {
   siteTitle :string= GlobalConstants.siteTitle;
   public userForm:FormGroup;
-  constructor(private http: HttpClient,private fb: FormBuilder){
+  constructor(
+    private http: HttpClient,
+    private fb: FormBuilder,
+    private router: Router){
     this.userForm = this.fb.group({
       username: '',
       password: ''
@@ -25,7 +30,7 @@ export class LoginComponent {
         .set('Content-Type', 'application/x-www-form-urlencoded')
     }).subscribe({
       next: data => {
-          console.log(data)
+        this.router.navigate(['/home'])
       },  
       error: error =>{
         console.log(error)
