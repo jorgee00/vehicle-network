@@ -14,6 +14,7 @@ export class MainComponent {
     leftIcon: "add",
     rightIcon: "logout"
   };
+  systemSel : string[] = [];
   data=[
     {
       type: "hola",
@@ -41,5 +42,27 @@ export class MainComponent {
       software:"hola",
       status:"hola"
     },
-  ]
+  ];
+  create(){
+    document.getElementById("mainModal")?.classList.remove("hidden");
+    document.getElementById("selectModal")?.classList.remove("hidden");
+  }
+  hiddeModal(){
+    document.getElementById("mainModal")?.classList.add("hidden");
+    document.getElementById("newSoftware")?.classList.add("hidden");
+    document.getElementById("newSystem")?.classList.add("hidden");
+  }
+  newSoftware(event:any){
+    this.stopPropagation(event);
+    document.getElementById("selectModal")?.classList.add("hidden");
+    document.getElementById("newSoftware")?.classList.remove("hidden");
+  }
+  newSystem(event:any){
+    this.stopPropagation(event);
+    document.getElementById("selectModal")?.classList.add("hidden");
+    document.getElementById("newSystem")?.classList.remove("hidden");
+  }
+  stopPropagation(event:any){
+    event.stopPropagation()
+  }
 }

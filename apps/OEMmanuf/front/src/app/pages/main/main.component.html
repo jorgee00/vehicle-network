@@ -1,5 +1,5 @@
 <div class="container">
-    <app-header [header]="header"></app-header>
+    <app-header [header]="header" (actionLeft)="create()"></app-header>
     <div class="content">
         <div class="table">
             <thead>
@@ -18,5 +18,36 @@
             </tbody>
         </div>
     </div>
-    
+</div>
+<div id="mainModal" class="modal hidden" (click)="hiddeModal()">
+    <div class="innerModal hidden" id="selectModal" (click)="stopPropagation($event)">
+        <div class="button" (click)="newSoftware($event)">Crear un nuevo software</div>
+        <div class="button" (click)="newSystem($event)">Crear un nuevo sistema</div>
+    </div>
+    <div class="innerModal hidden" id="newSoftware" (click)="stopPropagation($event)">
+        <h2>Creación de un nuevo software</h2>
+        <h3>Nombre:</h3>
+        <input class="input" type="text" name="" id="">
+        <input type="button" class="button" value="Crear">
+    </div>
+    <div class="innerModal hidden" id="newSystem" (click)="stopPropagation($event)">
+        <h2>Creación de un nuevo sistema</h2>
+        <h3>Nombre:</h3>
+        <input class="input" type="text" name="" id="">
+        <h3>Sistema:</h3>
+        <div class="sysInput">
+            <input type="text" name="" id="">
+            <span class="material-symbols-outlined">
+                add
+            </span>
+        </div>
+        
+        <div *ngFor="let elem of systemSel">
+            <h4>{{elem}}</h4>
+            <span class="material-symbols-outlined">
+                remove
+            </span>
+        </div>
+        <input type="button" class="button" value="Crear">
+    </div>
 </div>
