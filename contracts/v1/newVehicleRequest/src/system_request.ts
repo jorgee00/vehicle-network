@@ -1,9 +1,15 @@
 import{ Object, Property} from 'fabric-contract-api';
 
 @Object()
-export class Sistema {
+export class System {
+    @Property()
+    id:  string;
+
     @Property()
     nombre:  string;
+
+    @Property()
+    descripcion:  string;
 
     @Property()
     sw_included:  string;
@@ -12,7 +18,7 @@ export class Sistema {
     status:  string;
 
     @Property()
-    justification:     string;
+    justification: string;
 }
 
 /*export class CodifModelo {

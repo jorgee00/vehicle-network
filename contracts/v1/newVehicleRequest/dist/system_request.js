@@ -9,30 +9,38 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Sistema = void 0;
+exports.System = void 0;
 const fabric_contract_api_1 = require("fabric-contract-api");
-let Sistema = class Sistema {
+let System = class System {
 };
 __decorate([
     fabric_contract_api_1.Property(),
     __metadata("design:type", String)
-], Sistema.prototype, "nombre", void 0);
+], System.prototype, "id", void 0);
 __decorate([
     fabric_contract_api_1.Property(),
     __metadata("design:type", String)
-], Sistema.prototype, "sw_included", void 0);
+], System.prototype, "nombre", void 0);
 __decorate([
     fabric_contract_api_1.Property(),
     __metadata("design:type", String)
-], Sistema.prototype, "status", void 0);
+], System.prototype, "descripcion", void 0);
 __decorate([
     fabric_contract_api_1.Property(),
     __metadata("design:type", String)
-], Sistema.prototype, "justification", void 0);
-Sistema = __decorate([
+], System.prototype, "sw_included", void 0);
+__decorate([
+    fabric_contract_api_1.Property(),
+    __metadata("design:type", String)
+], System.prototype, "status", void 0);
+__decorate([
+    fabric_contract_api_1.Property(),
+    __metadata("design:type", String)
+], System.prototype, "justification", void 0);
+System = __decorate([
     fabric_contract_api_1.Object()
-], Sistema);
-exports.Sistema = Sistema;
+], System);
+exports.System = System;
 /*export class CodifModelo {
     marca:       string;
     modelo:      string;

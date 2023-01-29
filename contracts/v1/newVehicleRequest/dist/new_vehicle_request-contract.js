@@ -64,12 +64,15 @@ let NewVehicleRequestContract = NewVehicleRequestContract_1 = class NewVehicleRe
     async inicio(ctx) {
         console.log('Initializing the trade contract');
     }
-    async existe(ctx, id_doc) {
+    async exists(ctx, id_doc) {
         const buffer = await ctx.stub.getState(id_doc);
         return (!!buffer && buffer.length > 0);
     }
+    /**
+     * Functions related to Vehicle
+     */
     async sendNewVehicleDescription(ctx, id_doc, cod_modelo, systems) {
-        const exists = await this.existe(ctx, id_doc);
+        const exists = await this.exists(ctx, id_doc);
         if (exists) {
             throw new Error(`The trade ${id_doc} already exists`);
         }
@@ -89,38 +92,6 @@ let NewVehicleRequestContract = NewVehicleRequestContract_1 = class NewVehicleRe
         }
         const buffer = Buffer.from(JSON.stringify(vehicle));
         await ctx.stub.putState(id_doc, buffer);
-    }
-    async sendNewSystemDescription(ctx, nombre, sw_included) {
-        const exists = await this.existe(ctx, nombre);
-        if (exists) {
-            throw new Error(`The trade ${nombre} already exists`);
-        }
-        const system = new system_request_1.Sistema();
-        system.nombre = nombre;
-        system.sw_included = sw_included;
-        system.status = "REQUESTED";
-        const listOfSoftware = sw_included.replace(/\s/g, '');
-        const software = listOfSoftware.split(",");
-        var validSoftware;
-        for (let i = 0; i < software.length; i++) {
-            validSoftware = await this.isSoftwareValid(ctx, software[i]);
-            if (!validSoftware) {
-                system.status = "REJECTED";
-            }
-        }
-        const buffer = Buffer.from(JSON.stringify(system));
-        await ctx.stub.putState(nombre, buffer);
-    }
-    async sendNewSwDescription(ctx, nombre) {
-        const exists = await this.existe(ctx, nombre);
-        if (exists) {
-            throw new Error(`The trade ${nombre} already exists`);
-        }
-        const sw = new sw_request_1.Software();
-        sw.nombre = nombre;
-        sw.status = "REQUESTED";
-        const buffer = Buffer.from(JSON.stringify(sw));
-        await ctx.stub.putState(nombre, buffer);
     }
     async acceptVehicle(ctx, vehicleId, justification) {
         const vehicle = await this.getVehicleDescription(ctx, vehicleId);
@@ -142,6 +113,44 @@ let NewVehicleRequestContract = NewVehicleRequestContract_1 = class NewVehicleRe
         const buffer = Buffer.from(JSON.stringify(vehicle));
         await ctx.stub.putState(vehicleId, buffer);
     }
+    async getVehicleDescription(ctx, vehicleId) {
+        const exists = await this.exists(ctx, vehicleId);
+        if (!exists) {
+            throw new Error(`The vehicle ${vehicleId} does not exists`);
+        }
+        const buffer = await ctx.stub.getState(vehicleId);
+        const vehicle = JSON.parse(buffer.toString());
+        return vehicle;
+    }
+    async getVehicleSpecificationStatus(ctx, tradeId) {
+        const trade = await this.getVehicleDescription(ctx, tradeId);
+        const tradeStatus = { Status: trade.status, justification: trade.justification };
+        return tradeStatus;
+    }
+    /**
+     * Functions related to systems
+     */
+    async sendNewSystemDescription(ctx, id, descripcion, nombre, sw_included) {
+        const exists = await this.exists(ctx, "sys-" + id);
+        if (exists) {
+            throw new Error(`The trade sys-${id} already exists`);
+        }
+        const system = new system_request_1.System();
+        system.nombre = nombre;
+        system.id = "sys-" + id;
+        system.descripcion = descripcion;
+        system.sw_included = sw_included;
+        system.status = "REQUESTED";
+        for (const sw of sw_included.replace(/\s/g, '').split(",")) {
+            const validSoftware = await this.isSoftwareValid(ctx, sw);
+            if (!validSoftware) {
+                system.status = "REJECTED";
+                break;
+            }
+        }
+        const buffer = Buffer.from(JSON.stringify(system));
+        await ctx.stub.putState(system.id, buffer);
+    }
     async acceptSystem(ctx, systemId, justification) {
         const system = await this.getSystemDescription(ctx, systemId);
         if (system.status !== 'REQUESTED') {
@@ -161,6 +170,74 @@ let NewVehicleRequestContract = NewVehicleRequestContract_1 = class NewVehicleRe
         system.justification = justification;
         const buffer = Buffer.from(JSON.stringify(system));
         await ctx.stub.putState(systemID, buffer);
+    }
+    async getSystemDescription(ctx, systemId) {
+        const exists = await this.exists(ctx, systemId);
+        if (!exists) {
+            throw new Error(`The vehicle ${systemId} does not exists`);
+        }
+        const buffer = await ctx.stub.getState(systemId);
+        const system = JSON.parse(buffer.toString());
+        return system;
+    }
+    async isSystemValid(ctx, id_sys) {
+        if (await this.exists(ctx, id_sys)) {
+            const system = await this.getSystemDescription(ctx, id_sys);
+            if (system.status != 'REJECTED') {
+                for (const sw of system.sw_included.replace(/\s/g, '').split(",")) {
+                    if (!await this.isSoftwareValid(ctx, sw)) {
+                        return false;
+                    }
+                }
+                ;
+                return true;
+            }
+        }
+        return false;
+    }
+    async listSystem(ctx) {
+        const queryRegulator = {
+            selector: {
+                id: { $regex: 'sys-.+' },
+            }
+        };
+        const resultsetRegulator = await ctx.stub.getQueryResult(JSON.stringify(queryRegulator));
+        return await this.processResultSetSys(resultsetRegulator);
+    }
+    async processResultSetSys(resultset) {
+        try {
+            const tradeList = new Array();
+            while (true) {
+                const obj = await resultset.next();
+                if (obj.value) {
+                    const resultStr = Buffer.from(obj.value.value).toString('utf8');
+                    const tradeJSON = await JSON.parse(resultStr);
+                    tradeList.push(tradeJSON);
+                }
+                if (obj.done) {
+                    return tradeList;
+                }
+            }
+        }
+        finally {
+            await resultset.close();
+        }
+    }
+    /**
+     * Functions related to software
+     */
+    async sendNewSwDescription(ctx, id, nombre, descripcion) {
+        const exists = await this.exists(ctx, "sw-" + id);
+        if (exists) {
+            throw new Error(`The trade sw-${id} already exists`);
+        }
+        const sw = new sw_request_1.Software();
+        sw.nombre = nombre;
+        sw.id = "sw-" + id;
+        sw.descripcion = descripcion;
+        sw.status = "REQUESTED";
+        const buffer = Buffer.from(JSON.stringify(sw));
+        await ctx.stub.putState(sw.id, buffer);
     }
     async acceptSoftware(ctx, swId, justification) {
         const sw = await this.getSoftwareDescription(ctx, swId);
@@ -182,26 +259,8 @@ let NewVehicleRequestContract = NewVehicleRequestContract_1 = class NewVehicleRe
         const buffer = Buffer.from(JSON.stringify(sw));
         await ctx.stub.putState(swID, buffer);
     }
-    async getVehicleDescription(ctx, vehicleId) {
-        const exists = await this.existe(ctx, vehicleId);
-        if (!exists) {
-            throw new Error(`The vehicle ${vehicleId} does not exists`);
-        }
-        const buffer = await ctx.stub.getState(vehicleId);
-        const vehicle = JSON.parse(buffer.toString());
-        return vehicle;
-    }
-    async getSystemDescription(ctx, systemId) {
-        const exists = await this.existe(ctx, systemId);
-        if (!exists) {
-            throw new Error(`The vehicle ${systemId} does not exists`);
-        }
-        const buffer = await ctx.stub.getState(systemId);
-        const system = JSON.parse(buffer.toString());
-        return system;
-    }
     async getSoftwareDescription(ctx, swId) {
-        const exists = await this.existe(ctx, swId);
+        const exists = await this.exists(ctx, swId);
         if (!exists) {
             throw new Error(`The software ${swId} does not exists`);
         }
@@ -209,58 +268,36 @@ let NewVehicleRequestContract = NewVehicleRequestContract_1 = class NewVehicleRe
         const system = JSON.parse(buffer.toString());
         return system;
     }
-    async getVehicleSpecificationStatus(ctx, tradeId) {
-        const trade = await this.getVehicleDescription(ctx, tradeId);
-        const tradeStatus = { Status: trade.status, justification: trade.justification };
-        return tradeStatus;
+    async isSoftwareValid(ctx, id) {
+        return (await this.exists(ctx, id)) && (await this.getSoftwareDescription(ctx, id)).status == 'ACCEPTED';
     }
-    async isSystemValid(ctx, id_sys) {
-        /*const vehicle = await this.getVehicleDescription(ctx, id_sys);
-        const listOfSystems = vehicle.sistemas.replace(/\s/g,'');
-        const sistemas = listOfSystems.split(",");*/
-        //for(let i=0; i<sistemas.length; i++){
-        const exists = await this.existe(ctx, id_sys);
-        if (!exists) {
-            return false;
-        }
-        else {
-            const system = await this.getSystemDescription(ctx, id_sys);
-            if (system.status == 'REJECTED') {
-                return false;
+    async listSoftware(ctx) {
+        const queryRegulator = {
+            selector: {
+                id: { $regex: 'sw-.+' },
             }
-            else {
-                const listOfSoftware = system.sw_included.replace(/\s/g, '');
-                const software = listOfSoftware.split(",");
-                var softwareValid;
-                for (let i = 0; i < software.length; i++) {
-                    softwareValid = await this.isSoftwareValid(ctx, software[i]);
-                    if (!softwareValid) {
-                        return false;
-                    }
+        };
+        const resultsetRegulator = await ctx.stub.getQueryResult(JSON.stringify(queryRegulator));
+        return await this.processResultSetSw(resultsetRegulator);
+    }
+    async processResultSetSw(resultset) {
+        try {
+            const tradeList = new Array();
+            while (true) {
+                const obj = await resultset.next();
+                if (obj.value) {
+                    const resultStr = Buffer.from(obj.value.value).toString('utf8');
+                    const tradeJSON = await JSON.parse(resultStr);
+                    tradeList.push(tradeJSON);
+                }
+                if (obj.done) {
+                    return tradeList;
                 }
             }
         }
-        //}
-        return true;
-    }
-    async isSoftwareValid(ctx, id_sw) {
-        /*const system = await this.getSystemDescription(ctx, id_doc);
-        const listOfSoftware = system.sw_included.replace(/\s/g,'');
-        const software = listOfSoftware.split(",");*/
-        //var exists;
-        //for(let i=0; i<software.length; i++){
-        const exists = await this.existe(ctx, id_sw);
-        if (!exists) {
-            return false;
+        finally {
+            await resultset.close();
         }
-        else {
-            const sw = await this.getSoftwareDescription(ctx, id_sw);
-            if (sw.status == 'REJECTED') {
-                return false;
-            }
-        }
-        //}
-        return true;
     }
     /*
     @Transaction(false)
@@ -376,25 +413,13 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [fabric_contract_api_1.Context, String]),
     __metadata("design:returntype", Promise)
-], NewVehicleRequestContract.prototype, "existe", null);
+], NewVehicleRequestContract.prototype, "exists", null);
 __decorate([
     fabric_contract_api_1.Transaction(),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [fabric_contract_api_1.Context, String, String, String]),
     __metadata("design:returntype", Promise)
 ], NewVehicleRequestContract.prototype, "sendNewVehicleDescription", null);
-__decorate([
-    fabric_contract_api_1.Transaction(),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [fabric_contract_api_1.Context, String, String]),
-    __metadata("design:returntype", Promise)
-], NewVehicleRequestContract.prototype, "sendNewSystemDescription", null);
-__decorate([
-    fabric_contract_api_1.Transaction(),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [fabric_contract_api_1.Context, String]),
-    __metadata("design:returntype", Promise)
-], NewVehicleRequestContract.prototype, "sendNewSwDescription", null);
 __decorate([
     fabric_contract_api_1.Transaction(),
     __metadata("design:type", Function),
@@ -408,6 +433,26 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], NewVehicleRequestContract.prototype, "rejectVehicle", null);
 __decorate([
+    fabric_contract_api_1.Transaction(false),
+    fabric_contract_api_1.Returns('DescripcionVehic'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [fabric_contract_api_1.Context, String]),
+    __metadata("design:returntype", Promise)
+], NewVehicleRequestContract.prototype, "getVehicleDescription", null);
+__decorate([
+    fabric_contract_api_1.Transaction(false),
+    fabric_contract_api_1.Returns('DescripcionVehic'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [fabric_contract_api_1.Context, String]),
+    __metadata("design:returntype", Promise)
+], NewVehicleRequestContract.prototype, "getVehicleSpecificationStatus", null);
+__decorate([
+    fabric_contract_api_1.Transaction(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [fabric_contract_api_1.Context, String, String, String, String]),
+    __metadata("design:returntype", Promise)
+], NewVehicleRequestContract.prototype, "sendNewSystemDescription", null);
+__decorate([
     fabric_contract_api_1.Transaction(),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [fabric_contract_api_1.Context, String, String]),
@@ -419,6 +464,33 @@ __decorate([
     __metadata("design:paramtypes", [fabric_contract_api_1.Context, String, String]),
     __metadata("design:returntype", Promise)
 ], NewVehicleRequestContract.prototype, "rejectSystem", null);
+__decorate([
+    fabric_contract_api_1.Transaction(false),
+    fabric_contract_api_1.Returns('System'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [fabric_contract_api_1.Context, String]),
+    __metadata("design:returntype", Promise)
+], NewVehicleRequestContract.prototype, "getSystemDescription", null);
+__decorate([
+    fabric_contract_api_1.Transaction(false),
+    fabric_contract_api_1.Returns('boolean'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [fabric_contract_api_1.Context, String]),
+    __metadata("design:returntype", Promise)
+], NewVehicleRequestContract.prototype, "isSystemValid", null);
+__decorate([
+    fabric_contract_api_1.Transaction(false),
+    fabric_contract_api_1.Returns('System[]'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [fabric_contract_api_1.Context]),
+    __metadata("design:returntype", Promise)
+], NewVehicleRequestContract.prototype, "listSystem", null);
+__decorate([
+    fabric_contract_api_1.Transaction(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [fabric_contract_api_1.Context, String, String, String]),
+    __metadata("design:returntype", Promise)
+], NewVehicleRequestContract.prototype, "sendNewSwDescription", null);
 __decorate([
     fabric_contract_api_1.Transaction(),
     __metadata("design:type", Function),
@@ -433,20 +505,6 @@ __decorate([
 ], NewVehicleRequestContract.prototype, "rejectSoftware", null);
 __decorate([
     fabric_contract_api_1.Transaction(false),
-    fabric_contract_api_1.Returns('DescripcionVehic'),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [fabric_contract_api_1.Context, String]),
-    __metadata("design:returntype", Promise)
-], NewVehicleRequestContract.prototype, "getVehicleDescription", null);
-__decorate([
-    fabric_contract_api_1.Transaction(false),
-    fabric_contract_api_1.Returns('Sistema'),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [fabric_contract_api_1.Context, String]),
-    __metadata("design:returntype", Promise)
-], NewVehicleRequestContract.prototype, "getSystemDescription", null);
-__decorate([
-    fabric_contract_api_1.Transaction(false),
     fabric_contract_api_1.Returns('Software'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [fabric_contract_api_1.Context, String]),
@@ -454,25 +512,18 @@ __decorate([
 ], NewVehicleRequestContract.prototype, "getSoftwareDescription", null);
 __decorate([
     fabric_contract_api_1.Transaction(false),
-    fabric_contract_api_1.Returns('DescripcionVehic'),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [fabric_contract_api_1.Context, String]),
-    __metadata("design:returntype", Promise)
-], NewVehicleRequestContract.prototype, "getVehicleSpecificationStatus", null);
-__decorate([
-    fabric_contract_api_1.Transaction(false),
-    fabric_contract_api_1.Returns('boolean'),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [fabric_contract_api_1.Context, String]),
-    __metadata("design:returntype", Promise)
-], NewVehicleRequestContract.prototype, "isSystemValid", null);
-__decorate([
-    fabric_contract_api_1.Transaction(false),
     fabric_contract_api_1.Returns('boolean'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [fabric_contract_api_1.Context, String]),
     __metadata("design:returntype", Promise)
 ], NewVehicleRequestContract.prototype, "isSoftwareValid", null);
+__decorate([
+    fabric_contract_api_1.Transaction(false),
+    fabric_contract_api_1.Returns('Software[]'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [fabric_contract_api_1.Context]),
+    __metadata("design:returntype", Promise)
+], NewVehicleRequestContract.prototype, "listSoftware", null);
 NewVehicleRequestContract = NewVehicleRequestContract_1 = __decorate([
     fabric_contract_api_1.Info({ title: 'NewVehicleRequestContract', description: 'UpdateAd SmartContract' }),
     __metadata("design:paramtypes", [])
