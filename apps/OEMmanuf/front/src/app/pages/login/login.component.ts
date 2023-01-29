@@ -30,10 +30,10 @@ export class LoginComponent {
         .set('Content-Type', 'application/x-www-form-urlencoded')
     }).subscribe({
       next: data => {
-        this.router.navigate(['/home'])
+        this.router.navigate(['/home']);
       },  
       error: error =>{
-        console.log(error)
+        console.log(error);
       }
     });
   }

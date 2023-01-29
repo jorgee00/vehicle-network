@@ -134,24 +134,23 @@ public class RegulatorController {
                 return ResponseEntity.ok(tokenObj.toString());
         }
 
-        /*
         private String errorObj(String errorMessage) {
                 JSONObject errObj = new JSONObject();
                 errObj.put("result", false);
                 errObj.put("error", errorMessage);
                 return errObj.toString();
         }
-        @RequestMapping(value = "/issueEL", method = RequestMethod.POST)
-        public String issueEL(@RequestHeader Map<String, String> headers, String tradeId, String elId, String expirationDate) {
+        @RequestMapping(value = "/newSoftware", method = RequestMethod.POST)
+        public String newSoftware(@RequestHeader Map<String, String> headers, String tradeId, String elId, String expirationDate) {
                 String username = securityUtils.getUserNameFromTokenHeaders(headers);
                 if (username == null) {
                         return errorObj("Unable to get username from headers");
                 }
-                return FabricNetworkUtils.invokeContract(username, FabricNetworkUtils.shippingChannel, FabricNetworkUtils.elContractId,
+                return FabricNetworkUtils.invokeContract(username, FabricNetworkUtils.tradeChannel, FabricNetworkUtils.elContractId,
                                                     false, "issueEL", tradeId, elId, expirationDate);
         }
-
-        @RequestMapping(value = "/getTrade", method = RequestMethod.GET)
+        
+        @RequestMapping(value = "/getSoftware", method = RequestMethod.GET)
         public String getTrade(@RequestHeader Map<String, String> headers, String tradeId) {
                 String username = securityUtils.getUserNameFromTokenHeaders(headers);
                 if (username == null) {
@@ -160,7 +159,6 @@ public class RegulatorController {
                 return FabricNetworkUtils.invokeContract(username, FabricNetworkUtils.tradeChannel, FabricNetworkUtils.tradeContractId,
                                                     true, "getTrade", tradeId);
         }
-
         @RequestMapping(value = "/getTradeStatus", method = RequestMethod.GET)
         public String getTradeStatus(@RequestHeader Map<String, String> headers, String tradeId) {
                 String username = securityUtils.getUserNameFromTokenHeaders(headers);
@@ -177,7 +175,7 @@ public class RegulatorController {
                 if (username == null) {
                         return errorObj("Unable to get username from headers");
                 }
-                return FabricNetworkUtils.invokeContract(username, FabricNetworkUtils.shippingChannel, FabricNetworkUtils.elContractId,
+                return FabricNetworkUtils.invokeContract(username, FabricNetworkUtils.tradeChannel, FabricNetworkUtils.elContractId,
                                                     true, "getEL", tradeId);
         }
 
@@ -187,11 +185,11 @@ public class RegulatorController {
                 if (username == null) {
                         return errorObj("Unable to get username from headers");
                 }
-                return FabricNetworkUtils.invokeContract(username, FabricNetworkUtils.shippingChannel, FabricNetworkUtils.elContractId,
+                return FabricNetworkUtils.invokeContract(username, FabricNetworkUtils.tradeChannel, FabricNetworkUtils.elContractId,
                                                     true, "getELStatus", tradeId);
         }
 
-        @RequestMapping(value = "/listTrades", method = RequestMethod.GET)
+        @RequestMapping(value = "/listS", method = RequestMethod.GET)
         public String listTrades(@RequestHeader Map<String, String> headers) {
                 String username = securityUtils.getUserNameFromTokenHeaders(headers);
                 if (username == null) {
@@ -210,7 +208,7 @@ public class RegulatorController {
                 return FabricNetworkUtils.invokeContract(username, FabricNetworkUtils.tradeChannel, FabricNetworkUtils.tradeContractId,
                                                     true, "getTradesByRange", fromTradeId, toTradeId);
         }
-
+        /*
         @RequestMapping(value = "/getTradeHistory", method = RequestMethod.GET)
         public String getTradeHistory(@RequestHeader Map<String, String> headers, String tradeId) {
                 String username = securityUtils.getUserNameFromTokenHeaders(headers);

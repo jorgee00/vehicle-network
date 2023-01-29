@@ -24,9 +24,8 @@ public class FabricNetworkUtils {
     public static String regulatorOrgMsp = "OEMManufacturerOrgMSP";
 
     public static String tradeChannel = "tradechannel";
-    public static String shippingChannel = "shippingchannel";
 
-    public static String tradeContractId = "trade";
+    public static String tradeContractId = "softwareRequest";
     public static String elContractId = "exportLicense";
 
     public static String connectionProfilesBaseDir = "";
@@ -56,7 +55,7 @@ public class FabricNetworkUtils {
 
     public static String invokeContract(String userId, String channelName, String contractId, boolean isQuery, String func, String ...args) {
         JSONObject retval = new JSONObject();
-        if (!(channelName.equals(tradeChannel) || channelName.equals(shippingChannel))) {
+        if (!channelName.equals(tradeChannel)) {
             retval.put("result", false);
             retval.put("error", "Unknown channel: " + channelName);
             return retval.toString();

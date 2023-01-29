@@ -4,6 +4,7 @@
         <div class="table">
             <thead>
                 <th class="type">Tipo</th>
+                <th class="identifier">Identificador</th>
                 <th class="name">Nombre</th>
                 <th class="software">Software Requerido</th>
                 <th class="status">Estado</th>
@@ -11,6 +12,7 @@
             <tbody>
                 <tr *ngFor="let elem of data">
                     <td class="type">{{elem.type}}</td>
+                    <td class="identifier">{{elem.identifier}}</td>
                     <td class="name">{{elem.name}}</td>
                     <td class="software">{{elem.software}}</td>
                     <td class="status">{{elem.status}}</td>
@@ -26,28 +28,36 @@
     </div>
     <div class="innerModal hidden" id="newSoftware" (click)="stopPropagation($event)">
         <h2>Creación de un nuevo software</h2>
+        <h3>Identificador:</h3>
+        <input class="input" type="text" [(ngModel)]="id">
         <h3>Nombre:</h3>
-        <input class="input" type="text" name="" id="">
-        <input type="button" class="button" value="Crear">
+        <input class="input" type="text" [(ngModel)]="name">
+        <h3>Descripcion:</h3>
+        <input class="input" type="text" [(ngModel)]="description">
+        <input type="button" class="button" value="Crear" (click)="createSW()">
     </div>
     <div class="innerModal hidden" id="newSystem" (click)="stopPropagation($event)">
         <h2>Creación de un nuevo sistema</h2>
+        <h3>Identificador:</h3>
+        <input class="input" type="text" [(ngModel)]="id">
         <h3>Nombre:</h3>
-        <input class="input" type="text" name="" id="">
+        <input class="input" type="text" [(ngModel)]="name">
+        <h3>Descripcion:</h3>
+        <input class="input" type="text" [(ngModel)]="description">
         <h3>Sistema:</h3>
         <div class="sysInput">
-            <input type="text" name="" id="">
-            <span class="material-symbols-outlined">
+            <input type="text" [(ngModel)]="sysInput">
+            <span class="material-symbols-outlined" (click)="addSystem()">
                 add
             </span>
         </div>
         
-        <div *ngFor="let elem of systemSel">
+        <div *ngFor="let elem of systemSel" class="sysInput">
             <h4>{{elem}}</h4>
-            <span class="material-symbols-outlined">
+            <span class="material-symbols-outlined red" (click)="rmSystem(elem)">
                 remove
             </span>
         </div>
-        <input type="button" class="button" value="Crear">
+        <input type="button" class="button" value="Crear" (click)="createSys()">
     </div>
 </div>
