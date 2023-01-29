@@ -151,6 +151,15 @@ public class RegulatorController {
                                                     true, "listSoftware");
         }
 
+        @RequestMapping(value = "/listSystem", method = RequestMethod.GET)
+        public String listSystem(@RequestHeader Map<String, String> headers) {
+                String username = securityUtils.getUserNameFromTokenHeaders(headers);
+                if (username == null) {
+                        return errorObj("Unable to get username from headers");
+                }
+                return FabricNetworkUtils.invokeContract(username, FabricNetworkUtils.tradeChannel, FabricNetworkUtils.tradeContractId,
+                                                    true, "listSystem");
+        }
 
 
         @RequestMapping(value = "/newSoftware", method = RequestMethod.POST)

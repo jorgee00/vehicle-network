@@ -28,8 +28,8 @@ export class MainComponent implements OnInit{
 	){};
 	
 	async ngOnInit(){
-		this.data = await this.connector.listSoftwares();
-		this.data = await this.connector.listSystems();
+		this.data = await this.connector.listSoftware();
+		this.data = this.data.concat(await this.connector.listSystem());
 	}
 	create() {
 		document.getElementById("mainModal")?.classList.remove("hidden");

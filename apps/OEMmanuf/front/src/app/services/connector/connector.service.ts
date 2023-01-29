@@ -24,13 +24,12 @@ export class ConnectorService {
       resp.forEach(element => {
             element.type = "Software"
           });
-      console.log(resp)
       return resp;
     }
     return [];
   }
   async listSystem():Promise<Response[]>{
-    const data = await this.http.get<any>('/listSoftware',{
+    const data = await this.http.get<any>('/listSystem',{
       headers:{
         "Authorization": this.auth.getAuthorization()
       }
@@ -39,9 +38,8 @@ export class ConnectorService {
 		if(data && data.result){
       let resp:Response[] = JSON.parse(data.payload);
       resp.forEach(element => {
-            element.type = "Software"
+            element.type = "System"
           });
-      console.log(resp)
       return resp;
     }
     return [];
