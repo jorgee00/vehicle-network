@@ -12,3 +12,9 @@ node_modules
 
 # Ignore Mac hidden files
 .DS_Store
+
+.idea
+
+.vscode
+
+.gradle
