@@ -1,0 +1,138 @@
+.container {
+	height: 100vh;
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: start;
+	align-items: center;
+}
+
+app-header {
+	width: 100%;
+}
+.content{
+	width: 100%;
+	height: 100%;
+	display: flex;
+}
+.table {
+	margin: 0.5rem;
+	padding: 0.5rem;
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	background-color: white;
+	thead, tr{
+		width: 100%;
+		display: flex;
+		flex-direction: row;
+	}
+	tr:hover{
+		cursor: pointer;
+		background-color: rgba($color: #000000, $alpha: 0.05);
+	}
+	th{
+		line-height: 4rem;
+		border-bottom: 2px solid #2D3368;
+	}
+	.type, .identifier, .name, .status{
+		width: 15%;
+	} 
+	.software{
+		width: 40%;
+	}
+	td{
+		line-height: 3rem;
+		text-align: center;
+		border-bottom: 1px solid #437FD8;
+	}
+}
+.modal{
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	background-color: rgba($color: #000000, $alpha: .4);
+	z-index: 10;
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+}
+
+.innerModal{
+	display: flex;
+	flex-direction: column;
+	width: 25rem;
+	background-color: white;
+	border-radius: 10px;
+	padding: 2rem;
+	max-height: 90%;
+	h2{
+		font-size: 18pt;
+		border-bottom: 1px solid black;
+		padding-bottom: 0.75rem;
+		margin-bottom: 1rem;
+	}
+	h3{
+		font-weight: 500;
+		font-size: 14pt;  
+	}
+	h4{
+		font-weight: 400;
+		font-size: 14pt;
+		padding-left: 0.5rem;
+	}
+	p{
+		margin-bottom: 1rem;
+	}
+	p,textarea{
+		margin-top: 0.25rem;
+	}
+	.horizontal{
+		display: flex;
+		flex-direction: row;
+		justify-content: flex-start;
+		padding-bottom: 0.5rem;
+	}
+	.input{
+		border: 1px solid #387EE5;
+		padding: 0.5rem;
+		margin-bottom: 1rem;
+		border-radius: 5px;
+		&:focus{
+			outline: none;
+		}
+	}
+	.center{
+		justify-content: space-around;
+	}
+	.button{
+		border-radius: 5px;
+		padding: 1rem 2rem;
+		background-color: #387EE5;
+		border: 1px solid #387EE5;
+		color: white;
+		cursor: pointer;
+		transition: all .2s ease-in-out;
+		font-size: 16pt;
+		font-weight: 500;
+		text-align: center;
+		border: none;
+		&:hover{
+			transform: scale(1.05);
+		}
+	}
+	.transparent{
+		background-color: transparent;
+		color: #387EE5;
+		border: 1px solid #387EE5;
+	}
+}
+.hidden{
+	display: none;
+}
+.red{
+	color: red !important;
+}

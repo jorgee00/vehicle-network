@@ -72,16 +72,18 @@ export class NewSoftwareRequestContract extends Contract {
     }
 
     @Transaction()
-    public async sendNewSwDescription(ctx: Context, nombre: string): Promise<void> {
-        const exists = await this.existe(ctx, nombre);
+    public async sendNewSwDescription(ctx: Context, id:string ,nombre: string, descripcion:string): Promise<void> {
+        const exists = await this.existe(ctx, id);
         if (exists) {
-            throw new Error(`The trade ${nombre} already exists`);
+            throw new Error(`The trade ${id} already exists`);
         }
         const sw = new Software();
+        sw.id = id;
         sw.nombre = nombre;
+        sw.descripcion = descripcion;
         sw.status="REQUESTED";
         const buffer = Buffer.from(JSON.stringify(sw));
-        await ctx.stub.putState(nombre, buffer);
+        await ctx.stub.putState(id, buffer);
     }
 
     @Transaction()
@@ -121,7 +123,20 @@ export class NewSoftwareRequestContract extends Contract {
         const system = JSON.parse(buffer.toString()) as Software;
         return system;
     }
+    @Transaction(false)
+    @Returns('Software[]')
+    public async listSoftware(ctx: Context): Promise<Software[]> {
+        const queryRegulator = {
+            selector: {
+                id: { $regex: '.+' },
+            }
+        };
 
+        const resultsetRegulator = await ctx.stub.getQueryResult(JSON.stringify(queryRegulator));
+        return await this.processResultset(resultsetRegulator);
+    }
+    /*
+    
     /*@Transaction(false)
     @Returns('DescripcionVehic')
     public async getVehicleSpecificationStatus(ctx: Context, tradeId: string): Promise<VehicleRequestStatus> {
@@ -131,41 +146,7 @@ export class NewSoftwareRequestContract extends Contract {
     }*/
 
     /*
-    @Transaction(false)
-    @Returns('TradeAgreement[]')
-    public async listTrade(ctx: Context): Promise<TradeAgreement[]> {
-        const mspid = ctx.clientIdentity.getMSPID();
-        if (mspid === 'RegulatorOrgMSP') {
-            const queryRegulator = {
-                selector: {
-                    tradeID: { $regex: '.+' },
-                },
-                use_index: ['_design/regulatorIndexDoc', 'regulatorIndex'],
-            };
-
-            const resultsetRegulator = await ctx.stub.getQueryResult(JSON.stringify(queryRegulator));
-            return await this.processResultset(resultsetRegulator);
-        }
-        const queryExporter = {
-            selector: {
-                exporterMSP: ctx.clientIdentity.getMSPID(),
-            },
-            use_index: ['_design/exporterIndexDoc', 'exporterIndex'],
-        };
-        const queryImporter = {
-            selector: {
-                importerMSP: ctx.clientIdentity.getMSPID(),
-            },
-            use_index: ['_design/importerIndexDoc', 'importerIndex'],
-        };
-
-        const resultsetExporter = await ctx.stub.getQueryResult(JSON.stringify(queryExporter));
-        const resultsetImporter = await ctx.stub.getQueryResult(JSON.stringify(queryImporter));
-
-        return this.mergeResults(
-                        await this.processResultset(resultsetExporter),
-                        await this.processResultset(resultsetImporter));
-    }
+    
 
     @Transaction(false)
     @Returns('TradeAgreement[]')

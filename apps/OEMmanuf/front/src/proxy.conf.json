@@ -2,5 +2,9 @@
     "/login": {
       "target": "http://localhost:6000",
       "secure": false
+    },
+    "/listSoftware": {
+      "target": "http://localhost:6000",
+      "secure": false
     }
   }

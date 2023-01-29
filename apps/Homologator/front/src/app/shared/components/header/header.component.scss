@@ -1,0 +1,34 @@
+.header{
+    width: 100%;
+    height: 4.5rem;
+    background-color: #2D3368;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: row;
+    color: white;
+    align-items: center;
+    justify-content: flex-start;
+}
+h1{
+    flex-basis: 100%;
+    text-align: center;
+    border-right: 1px solid white;
+    font-weight: 600;
+    line-height: 4.5rem;
+}
+h2{
+    padding: 0 2rem 0 4rem;
+    line-height: 4.5rem;
+    font-size: 16pt;
+    text-transform: capitalize;
+}
+.icon{
+    font-size: 25pt;
+    padding: 0 1rem;
+    cursor: pointer;
+    transition: all .2s ease-in-out;
+    &:hover{
+        transform: scale(1.2);
+    }
+}

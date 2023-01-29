@@ -18,3 +18,11 @@ node_modules
 .vscode
 
 .gradle
+
+.angular
+
+apps/Homologator/back/bin
+apps/Homologator/back/build
+
+apps/OEMmanuf/back/bin
+apps/OEMmanuf/back/build

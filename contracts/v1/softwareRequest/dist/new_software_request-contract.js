@@ -69,16 +69,18 @@ let NewSoftwareRequestContract = NewSoftwareRequestContract_1 = class NewSoftwar
         const buffer = await ctx.stub.getState(id_doc);
         return (!!buffer && buffer.length > 0);
     }
-    async sendNewSwDescription(ctx, nombre) {
-        const exists = await this.existe(ctx, nombre);
+    async sendNewSwDescription(ctx, id, nombre, descripcion) {
+        const exists = await this.existe(ctx, id);
         if (exists) {
-            throw new Error(`The trade ${nombre} already exists`);
+            throw new Error(`The trade ${id} already exists`);
         }
         const sw = new software_request_1.Software();
+        sw.id = id;
         sw.nombre = nombre;
+        sw.descripcion = descripcion;
         sw.status = "REQUESTED";
         const buffer = Buffer.from(JSON.stringify(sw));
-        await ctx.stub.putState(nombre, buffer);
+        await ctx.stub.putState(id, buffer);
     }
     async acceptSoftware(ctx, swId, justification) {
         const sw = await this.getSoftwareDescription(ctx, swId);
@@ -109,6 +111,17 @@ let NewSoftwareRequestContract = NewSoftwareRequestContract_1 = class NewSoftwar
         const system = JSON.parse(buffer.toString());
         return system;
     }
+    async listSoftware(ctx) {
+        const queryRegulator = {
+            selector: {
+                id: { $regex: '.+' },
+            }
+        };
+        const resultsetRegulator = await ctx.stub.getQueryResult(JSON.stringify(queryRegulator));
+        return await this.processResultset(resultsetRegulator);
+    }
+    /*
+    
     /*@Transaction(false)
     @Returns('DescripcionVehic')
     public async getVehicleSpecificationStatus(ctx: Context, tradeId: string): Promise<VehicleRequestStatus> {
@@ -117,41 +130,7 @@ let NewSoftwareRequestContract = NewSoftwareRequestContract_1 = class NewSoftwar
         return tradeStatus;
     }*/
     /*
-    @Transaction(false)
-    @Returns('TradeAgreement[]')
-    public async listTrade(ctx: Context): Promise<TradeAgreement[]> {
-        const mspid = ctx.clientIdentity.getMSPID();
-        if (mspid === 'RegulatorOrgMSP') {
-            const queryRegulator = {
-                selector: {
-                    tradeID: { $regex: '.+' },
-                },
-                use_index: ['_design/regulatorIndexDoc', 'regulatorIndex'],
-            };
-
-            const resultsetRegulator = await ctx.stub.getQueryResult(JSON.stringify(queryRegulator));
-            return await this.processResultset(resultsetRegulator);
-        }
-        const queryExporter = {
-            selector: {
-                exporterMSP: ctx.clientIdentity.getMSPID(),
-            },
-            use_index: ['_design/exporterIndexDoc', 'exporterIndex'],
-        };
-        const queryImporter = {
-            selector: {
-                importerMSP: ctx.clientIdentity.getMSPID(),
-            },
-            use_index: ['_design/importerIndexDoc', 'importerIndex'],
-        };
-
-        const resultsetExporter = await ctx.stub.getQueryResult(JSON.stringify(queryExporter));
-        const resultsetImporter = await ctx.stub.getQueryResult(JSON.stringify(queryImporter));
-
-        return this.mergeResults(
-                        await this.processResultset(resultsetExporter),
-                        await this.processResultset(resultsetImporter));
-    }
+    
 
     @Transaction(false)
     @Returns('TradeAgreement[]')
@@ -234,7 +213,7 @@ __decorate([
 __decorate([
     fabric_contract_api_1.Transaction(),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [fabric_contract_api_1.Context, String]),
+    __metadata("design:paramtypes", [fabric_contract_api_1.Context, String, String, String]),
     __metadata("design:returntype", Promise)
 ], NewSoftwareRequestContract.prototype, "sendNewSwDescription", null);
 __decorate([
@@ -256,6 +235,13 @@ __decorate([
     __metadata("design:paramtypes", [fabric_contract_api_1.Context, String]),
     __metadata("design:returntype", Promise)
 ], NewSoftwareRequestContract.prototype, "getSoftwareDescription", null);
+__decorate([
+    fabric_contract_api_1.Transaction(false),
+    fabric_contract_api_1.Returns('Software[]'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [fabric_contract_api_1.Context]),
+    __metadata("design:returntype", Promise)
+], NewSoftwareRequestContract.prototype, "listSoftware", null);
 NewSoftwareRequestContract = NewSoftwareRequestContract_1 = __decorate([
     fabric_contract_api_1.Info({ title: 'NewSoftwareRequestContract', description: 'System Request SmartContract' }),
     __metadata("design:paramtypes", [])

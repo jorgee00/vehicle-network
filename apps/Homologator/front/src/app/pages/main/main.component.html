@@ -1,0 +1,46 @@
+<div class="container">
+    <app-header [header]="header"></app-header>
+    <div class="content">
+        <div class="table">
+            <thead>
+                <th class="type">Tipo</th>
+                <th class="identifier">Identificador</th>
+                <th class="name">Nombre</th>
+                <th class="software">Descripcion</th>
+                <th class="status">Estado</th>
+            </thead>
+            <tbody>
+                <tr *ngFor="let elem of data" (click)="openElem(elem)">
+                    <td class="type">{{elem.type}}</td>
+                    <td class="identifier">{{elem.id}}</td>
+                    <td class="name">{{elem.name}}</td>
+                    <td class="software">{{elem.description}}</td>
+                    <td class="status">{{elem.status}}</td>
+                </tr>
+            </tbody>
+        </div>
+    </div>
+</div>
+<div id="mainModal" class="modal hidden" (click)="hiddeModal()">
+    <div class="innerModal hidden" id="chooseOption" (click)="stopPropagation($event)">
+        <h2>Creación de un nuevo software</h2>
+        <div class="horizontal">
+            <h3>Identificador:</h3>
+            <h4>{{id}}</h4>
+        </div>
+        <div class="horizontal">
+            <h3>Nombre:</h3>
+            <h4>{{name}}</h4>
+        </div>
+        <h3>Descripcion:</h3>
+        <p>{{description}}</p>
+
+        <h3>Justificacion:</h3>
+        <textarea class="input" [(ngModel)]="reason"> </textarea>
+
+        <div class="horizontal center">
+            <input type="button" class="button transparent" value="Rechazar" (click)="reject()">
+            <input type="button" class="button" value="Aceptar" (click)="accept()">
+        </div>
+    </div>
+</div>

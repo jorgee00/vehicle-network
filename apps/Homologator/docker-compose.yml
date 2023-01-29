@@ -1,0 +1,20 @@
+version: '3'
+services:
+  homologator-back:
+      build: ./back
+      container_name: homologator-back
+      ports:
+        - 6000:6000
+      volumes:
+        - ../../gateways/homologatororg:/config/gateways/homologatororg
+        - ../../wallets/homologatororg:/config/wallets/homologatororg
+      tty: true
+
+  homologator-front:
+      build: ./front
+      container_name: homologator-front
+      ports:
+        - 81:80
+      links:
+        - homologator-back
+      tty: true

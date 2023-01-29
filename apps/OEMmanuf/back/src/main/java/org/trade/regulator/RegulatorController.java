@@ -140,13 +140,26 @@ public class RegulatorController {
                 errObj.put("error", errorMessage);
                 return errObj.toString();
         }
+
+        @RequestMapping(value = "/listSoftware", method = RequestMethod.GET)
+        public String listSoftware(@RequestHeader Map<String, String> headers) {
+                String username = securityUtils.getUserNameFromTokenHeaders(headers);
+                if (username == null) {
+                        return errorObj("Unable to get username from headers");
+                }
+                return FabricNetworkUtils.invokeContract(username, FabricNetworkUtils.tradeChannel, FabricNetworkUtils.tradeContractId,
+                                                    true, "listSoftware");
+        }
+
+
+
         @RequestMapping(value = "/newSoftware", method = RequestMethod.POST)
         public String newSoftware(@RequestHeader Map<String, String> headers, String tradeId, String elId, String expirationDate) {
                 String username = securityUtils.getUserNameFromTokenHeaders(headers);
                 if (username == null) {
                         return errorObj("Unable to get username from headers");
                 }
-                return FabricNetworkUtils.invokeContract(username, FabricNetworkUtils.tradeChannel, FabricNetworkUtils.elContractId,
+                return FabricNetworkUtils.invokeContract(username, FabricNetworkUtils.tradeChannel, FabricNetworkUtils.tradeContractId,
                                                     false, "issueEL", tradeId, elId, expirationDate);
         }
         
@@ -175,7 +188,7 @@ public class RegulatorController {
                 if (username == null) {
                         return errorObj("Unable to get username from headers");
                 }
-                return FabricNetworkUtils.invokeContract(username, FabricNetworkUtils.tradeChannel, FabricNetworkUtils.elContractId,
+                return FabricNetworkUtils.invokeContract(username, FabricNetworkUtils.tradeChannel, FabricNetworkUtils.tradeContractId,
                                                     true, "getEL", tradeId);
         }
 
@@ -185,19 +198,11 @@ public class RegulatorController {
                 if (username == null) {
                         return errorObj("Unable to get username from headers");
                 }
-                return FabricNetworkUtils.invokeContract(username, FabricNetworkUtils.tradeChannel, FabricNetworkUtils.elContractId,
+                return FabricNetworkUtils.invokeContract(username, FabricNetworkUtils.tradeChannel, FabricNetworkUtils.tradeContractId,
                                                     true, "getELStatus", tradeId);
         }
 
-        @RequestMapping(value = "/listS", method = RequestMethod.GET)
-        public String listTrades(@RequestHeader Map<String, String> headers) {
-                String username = securityUtils.getUserNameFromTokenHeaders(headers);
-                if (username == null) {
-                        return errorObj("Unable to get username from headers");
-                }
-                return FabricNetworkUtils.invokeContract(username, FabricNetworkUtils.tradeChannel, FabricNetworkUtils.tradeContractId,
-                                                    true, "listTrade");
-        }
+        
 
         @RequestMapping(value = "/getTradesByRange", method = RequestMethod.GET)
         public String getTradesByRange(@RequestHeader Map<String, String> headers, String fromTradeId, String toTradeId) {

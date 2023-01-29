@@ -1,6 +1,6 @@
 {
     "name": "software_request",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "description": "New Software Request Contract",
     "main": "dist/index.js",
     "typings": "dist/index.d.ts",

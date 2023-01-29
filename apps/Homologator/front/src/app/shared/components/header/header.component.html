@@ -1,0 +1,6 @@
+<div class = "header">
+    <span *ngIf='header.leftIcon' class="icon material-symbols-outlined" (click)="actionLeft.emit()">{{header.leftIcon}}</span>
+    <h1>{{header.pageTitle}}</h1>
+    <h2 *ngIf='currentUser'> {{currentUser}}</h2>
+    <span *ngIf='currentUser' class="icon material-symbols-outlined" (click)="logout()">logout</span>
+</div>

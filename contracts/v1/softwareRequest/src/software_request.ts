@@ -3,7 +3,13 @@ import{ Object, Property} from 'fabric-contract-api';
 @Object()
 export class Software {
     @Property()
+    id:  string;
+
+    @Property()
     nombre:  string;
+
+    @Property()
+    descripcion:  string;
 
     @Property()
     status:  string;

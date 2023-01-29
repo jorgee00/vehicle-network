@@ -16,7 +16,15 @@ let Software = class Software {
 __decorate([
     fabric_contract_api_1.Property(),
     __metadata("design:type", String)
+], Software.prototype, "id", void 0);
+__decorate([
+    fabric_contract_api_1.Property(),
+    __metadata("design:type", String)
 ], Software.prototype, "nombre", void 0);
+__decorate([
+    fabric_contract_api_1.Property(),
+    __metadata("design:type", String)
+], Software.prototype, "descripcion", void 0);
 __decorate([
     fabric_contract_api_1.Property(),
     __metadata("design:type", String)

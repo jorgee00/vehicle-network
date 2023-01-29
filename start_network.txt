@@ -1,0 +1,11 @@
+Vehicle-network:
+	|-Ir a la carpeta bash: cd bash
+	|-Levantar la red: sudo docker compose -f docker-compose-e2e.yaml -f docker-compose-couchdb.yaml up
+
+Back
+	|-Compilar: gradle build
+	|-Ejecutar: sudo java -jar build/libs/regulator-0.0.1-SNAPSHOT.jar
+	|-Crear usuario: curl -X POST http://localhost:6000/register -H "content-type: application/x-www-form-urlencoded" -d 'registrarUser=admin&registrarPassword=adminpw&username=user&password=password&role=client'
+
+Front:
+	|-Levantar: sudo npm run start
