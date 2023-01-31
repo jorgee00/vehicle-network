@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { GlobalConstants } from 'src/app/shared/global-constants';
 import { Header } from 'src/app/shared/models/header';
 import { ToastrService } from 'ngx-toastr';
-import { HttpClient } from '@angular/common/http';
 import { ConnectorService } from 'src/app/services/connector/connector.service';
 import { Response } from 'src/app/shared/models/response';
 
@@ -84,9 +83,8 @@ export class MainComponent implements OnInit{
 			error += "Descripción ";
 		}
 		if(error == ''){
-			this.toastr.success("Se creo correctamente el software.","Éxito",{
-				timeOut: 3000,
-			});
+			this.connector.newSoftware(this.id,this.name,this.description);
+			this.hiddeModal();
 		}else{
 			this.toastr.error("Debe de rellenar los siguientes campos: " + error,"Error",{
 				timeOut: 3000,
@@ -108,13 +106,10 @@ export class MainComponent implements OnInit{
 			error += "Sistemas ";
 		}
 		if(error == ''){
-			this.toastr.success("Se creo correctamente el sistema.","Éxito",{
-				timeOut: 3000,
-			});
+			this.connector.newSystem(this.id,this.name,this.description,this.systemSel.toString());
 			this.hiddeModal();
 		}else{
-			this.toastr.error("Debe de rellenar los siguientes campos: " + error,
-				"Error",{
+			this.toastr.error("Debe de rellenar los siguientes campos: " + error,"Error",{
 				timeOut: 3000,
 			});
 		}
