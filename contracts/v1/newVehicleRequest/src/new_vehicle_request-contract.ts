@@ -94,7 +94,7 @@ export class NewVehicleRequestContract extends Contract {
 		vehicle.status="REQUESTED";
 		var validSystems;
 		for(let i=0; i<sistemas.length; i++){
-			validSystems= await this.isSystemValid(ctx, sistemas[i]);
+			validSystems= await this.isSysValid(ctx, sistemas[i]);
 			if(!validSystems){
 				vehicle.status="REJECTED";
 			}
@@ -153,7 +153,7 @@ export class NewVehicleRequestContract extends Contract {
 	 * Functions related to systems 
 	 */
 	@Transaction()
-	public async sendNewSystemDescription(ctx: Context, id:string, descripcion:string, nombre: string, sw_included: string): Promise<void> {
+	public async sendNewSysDescription(ctx: Context, id:string, descripcion:string, nombre: string, sw_included: string): Promise<void> {
 		const exists = await this.exists(ctx, "sys-" + id);
 		if (exists) {
 			throw new Error(`The trade sys-${id} already exists`);
@@ -167,8 +167,7 @@ export class NewVehicleRequestContract extends Contract {
 		system.status="REQUESTED";
 
 		for(const sw of sw_included.replace(/\s/g,'').split(",")){
-			const validSoftware= await this.isSoftwareValid(ctx, sw);
-			if(!validSoftware){
+			if((await this.getSwStatus(ctx, sw)) === "REJECTED"){
 				system.status="REJECTED";
 				break;
 			}
@@ -178,8 +177,8 @@ export class NewVehicleRequestContract extends Contract {
 	}
 
 	@Transaction()
-	public async acceptSystem(ctx: Context, systemId: string, justification: string): Promise<void> {
-		const system = await this.getSystemDescription(ctx, systemId);
+	public async acceptSys(ctx: Context, systemId: string, justification: string): Promise<void> {
+		const system = await this.getSysDescription(ctx, systemId);
 
 		if (system.status !== 'REQUESTED') {
 			throw new Error('The system ' + systemId + ' is in the wrong status.  Expected REQUESTED got ' + system.status);
@@ -191,8 +190,8 @@ export class NewVehicleRequestContract extends Contract {
 	}
 
 	@Transaction()
-	public async rejectSystem(ctx: Context, systemID: string, justification: string): Promise<void> {
-		const system = await this.getSystemDescription(ctx, systemID);
+	public async rejectSys(ctx: Context, systemID: string, justification: string): Promise<void> {
+		const system = await this.getSysDescription(ctx, systemID);
 
 		if (system.status !== 'REQUESTED') {
 			throw new Error('The system ' + systemID + ' is in the wrong status.  Expected REQUESTED got ' + system.status);
@@ -205,7 +204,7 @@ export class NewVehicleRequestContract extends Contract {
 
 	@Transaction(false)
 	@Returns('System')
-	public async getSystemDescription(ctx: Context, systemId: string): Promise<System> {
+	public async getSysDescription(ctx: Context, systemId: string): Promise<System> {
 		const exists = await this.exists(ctx, systemId);
 		if (!exists) {
 			throw new Error(`The vehicle ${systemId} does not exists`);
@@ -217,12 +216,12 @@ export class NewVehicleRequestContract extends Contract {
 
 	@Transaction(false)
 	@Returns('boolean')
-	public async isSystemValid(ctx: Context, id_sys: string): Promise<boolean> {
+	public async isSysValid(ctx: Context, id_sys: string): Promise<boolean> {
 		if(await this.exists(ctx, id_sys)){
-			const system = await this.getSystemDescription(ctx, id_sys);
+			const system = await this.getSysDescription(ctx, id_sys);
 			if(system.status != 'REJECTED'){
 				for(const sw of system.sw_included.replace(/\s/g,'').split(",")){
-					if( !await this.isSoftwareValid(ctx, sw)){
+					if( !await this.isSwValid(ctx, sw)){
 						return false;
 					}
 				};
@@ -234,7 +233,7 @@ export class NewVehicleRequestContract extends Contract {
 
 	@Transaction(false)
 	@Returns('System[]')
-	public async listSystem(ctx: Context): Promise<System[]> {
+	public async listSys(ctx: Context): Promise<System[]> {
 		const queryRegulator = {
 			selector: {
 				id: { $regex: 'sys-.+' },
@@ -286,8 +285,8 @@ export class NewVehicleRequestContract extends Contract {
 	}
 
 	@Transaction()
-	public async acceptSoftware(ctx: Context, swId: string, justification: string): Promise<void> {
-		const sw = await this.getSoftwareDescription(ctx, swId);
+	public async acceptSw(ctx: Context, swId: string, justification: string): Promise<void> {
+		const sw = await this.getSwDescription(ctx, swId);
 
 		if (sw.status !== 'REQUESTED') {
 			throw new Error('The software ' + swId + ' is in the wrong status.  Expected REQUESTED got ' + sw.status);
@@ -299,8 +298,8 @@ export class NewVehicleRequestContract extends Contract {
 	}
 
 	@Transaction()
-	public async rejectSoftware(ctx: Context, swID: string, justification: string): Promise<void> {
-		const sw = await this.getSoftwareDescription(ctx, swID);
+	public async rejectSw(ctx: Context, swID: string, justification: string): Promise<void> {
+		const sw = await this.getSwDescription(ctx, swID);
 
 		if (sw.status !== 'REQUESTED') {
 			throw new Error('The software ' + swID + ' is in the wrong status.  Expected REQUESTED got ' + sw.status);
@@ -314,7 +313,7 @@ export class NewVehicleRequestContract extends Contract {
 
 	@Transaction(false)
 	@Returns('Software')
-	public async getSoftwareDescription(ctx: Context, swId: string): Promise<Software> {
+	public async getSwDescription(ctx: Context, swId: string): Promise<Software> {
 		const exists = await this.exists(ctx, swId);
 		if (!exists) {
 			throw new Error(`The software ${swId} does not exists`);
@@ -327,13 +326,19 @@ export class NewVehicleRequestContract extends Contract {
 
 	@Transaction(false)
 	@Returns('boolean')
-	public async isSoftwareValid(ctx: Context, id: string): Promise<boolean> {
-		return (await this.exists(ctx, id)) && (await this.getSoftwareDescription(ctx, id)).status == 'ACCEPTED';
+	public async isSwValid(ctx: Context, id: string): Promise<boolean> {
+		return (await this.exists(ctx, id)) && (await this.getSwDescription(ctx, id)).status == 'ACCEPTED';
+	}
+
+	@Transaction(false)
+	@Returns('string')
+	public async getSwStatus(ctx: Context, id: string): Promise<string> {
+		return (await this.getSwDescription(ctx, id)).status;
 	}
 
 	@Transaction(false)
 	@Returns('Software[]')
-	public async listSoftware(ctx: Context): Promise<Software[]> {
+	public async listSw(ctx: Context): Promise<Software[]> {
 		const queryRegulator = {
 			selector: {
 				id: { $regex: 'sw-.+' },

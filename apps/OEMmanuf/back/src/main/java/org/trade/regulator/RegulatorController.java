@@ -148,7 +148,7 @@ public class RegulatorController {
                         return errorObj("Unable to get username from headers");
                 }
                 return FabricNetworkUtils.invokeContract(username, FabricNetworkUtils.tradeChannel, FabricNetworkUtils.tradeContractId,
-                                                    true, "listSoftware");
+                                                    true, "listSw");
         }
 
 
@@ -159,7 +159,7 @@ public class RegulatorController {
                         return errorObj("Unable to get username from headers");
                 }
                 return FabricNetworkUtils.invokeContract(username, FabricNetworkUtils.tradeChannel, FabricNetworkUtils.tradeContractId,
-                                                    false, "sendNewSoftwareDescription", id, nombre, descripcion);
+                                                    false, "sendNewSwDescription", id, nombre, descripcion);
         }
         
         @RequestMapping(value = "/getSoftware", method = RequestMethod.GET)
@@ -169,7 +169,7 @@ public class RegulatorController {
                         return errorObj("Unable to get username from headers");
                 }
                 return FabricNetworkUtils.invokeContract(username, FabricNetworkUtils.tradeChannel, FabricNetworkUtils.tradeContractId,
-                                                    true, "getSoftwareDescription", swId);
+                                                    true, "getSwDescription", swId);
         }
         
         @RequestMapping(value = "/listSystem", method = RequestMethod.GET)
@@ -179,7 +179,7 @@ public class RegulatorController {
                         return errorObj("Unable to get username from headers");
                 }
                 return FabricNetworkUtils.invokeContract(username, FabricNetworkUtils.tradeChannel, FabricNetworkUtils.tradeContractId,
-                                                    true, "listSystem");
+                                                    true, "listSys");
         }
 
         @RequestMapping(value = "/newSystem", method = RequestMethod.POST)
@@ -189,7 +189,7 @@ public class RegulatorController {
                         return errorObj("Unable to get username from headers");
                 }
                 return FabricNetworkUtils.invokeContract(username, FabricNetworkUtils.tradeChannel, FabricNetworkUtils.tradeContractId,
-                                                    false, "sendNewSystemDescription", id, nombre, descripcion, sw_included);
+                                                    false, "sendNewSysDescription", id, nombre, descripcion, sw_included);
         }
         
         @RequestMapping(value = "/getSystem", method = RequestMethod.GET)
@@ -199,6 +199,6 @@ public class RegulatorController {
                         return errorObj("Unable to get username from headers");
                 }
                 return FabricNetworkUtils.invokeContract(username, FabricNetworkUtils.tradeChannel, FabricNetworkUtils.tradeContractId,
-                                                    true, "getSystemDescription", sysId);
+                                                    true, "getSysDescription", sysId);
         }
 }

@@ -85,7 +85,7 @@ let NewVehicleRequestContract = NewVehicleRequestContract_1 = class NewVehicleRe
         vehicle.status = "REQUESTED";
         var validSystems;
         for (let i = 0; i < sistemas.length; i++) {
-            validSystems = await this.isSystemValid(ctx, sistemas[i]);
+            validSystems = await this.isSysValid(ctx, sistemas[i]);
             if (!validSystems) {
                 vehicle.status = "REJECTED";
             }
@@ -130,7 +130,7 @@ let NewVehicleRequestContract = NewVehicleRequestContract_1 = class NewVehicleRe
     /**
      * Functions related to systems
      */
-    async sendNewSystemDescription(ctx, id, descripcion, nombre, sw_included) {
+    async sendNewSysDescription(ctx, id, descripcion, nombre, sw_included) {
         const exists = await this.exists(ctx, "sys-" + id);
         if (exists) {
             throw new Error(`The trade sys-${id} already exists`);
@@ -142,8 +142,7 @@ let NewVehicleRequestContract = NewVehicleRequestContract_1 = class NewVehicleRe
         system.sw_included = sw_included;
         system.status = "REQUESTED";
         for (const sw of sw_included.replace(/\s/g, '').split(",")) {
-            const validSoftware = await this.isSoftwareValid(ctx, sw);
-            if (!validSoftware) {
+            if ((await this.getSwStatus(ctx, sw)) === "REJECTED") {
                 system.status = "REJECTED";
                 break;
             }
@@ -151,8 +150,8 @@ let NewVehicleRequestContract = NewVehicleRequestContract_1 = class NewVehicleRe
         const buffer = Buffer.from(JSON.stringify(system));
         await ctx.stub.putState(system.id, buffer);
     }
-    async acceptSystem(ctx, systemId, justification) {
-        const system = await this.getSystemDescription(ctx, systemId);
+    async acceptSys(ctx, systemId, justification) {
+        const system = await this.getSysDescription(ctx, systemId);
         if (system.status !== 'REQUESTED') {
             throw new Error('The system ' + systemId + ' is in the wrong status.  Expected REQUESTED got ' + system.status);
         }
@@ -161,8 +160,8 @@ let NewVehicleRequestContract = NewVehicleRequestContract_1 = class NewVehicleRe
         const buffer = Buffer.from(JSON.stringify(system));
         await ctx.stub.putState(systemId, buffer);
     }
-    async rejectSystem(ctx, systemID, justification) {
-        const system = await this.getSystemDescription(ctx, systemID);
+    async rejectSys(ctx, systemID, justification) {
+        const system = await this.getSysDescription(ctx, systemID);
         if (system.status !== 'REQUESTED') {
             throw new Error('The system ' + systemID + ' is in the wrong status.  Expected REQUESTED got ' + system.status);
         }
@@ -171,7 +170,7 @@ let NewVehicleRequestContract = NewVehicleRequestContract_1 = class NewVehicleRe
         const buffer = Buffer.from(JSON.stringify(system));
         await ctx.stub.putState(systemID, buffer);
     }
-    async getSystemDescription(ctx, systemId) {
+    async getSysDescription(ctx, systemId) {
         const exists = await this.exists(ctx, systemId);
         if (!exists) {
             throw new Error(`The vehicle ${systemId} does not exists`);
@@ -180,12 +179,12 @@ let NewVehicleRequestContract = NewVehicleRequestContract_1 = class NewVehicleRe
         const system = JSON.parse(buffer.toString());
         return system;
     }
-    async isSystemValid(ctx, id_sys) {
+    async isSysValid(ctx, id_sys) {
         if (await this.exists(ctx, id_sys)) {
-            const system = await this.getSystemDescription(ctx, id_sys);
+            const system = await this.getSysDescription(ctx, id_sys);
             if (system.status != 'REJECTED') {
                 for (const sw of system.sw_included.replace(/\s/g, '').split(",")) {
-                    if (!await this.isSoftwareValid(ctx, sw)) {
+                    if (!await this.isSwValid(ctx, sw)) {
                         return false;
                     }
                 }
@@ -195,7 +194,7 @@ let NewVehicleRequestContract = NewVehicleRequestContract_1 = class NewVehicleRe
         }
         return false;
     }
-    async listSystem(ctx) {
+    async listSys(ctx) {
         const queryRegulator = {
             selector: {
                 id: { $regex: 'sys-.+' },
@@ -239,8 +238,8 @@ let NewVehicleRequestContract = NewVehicleRequestContract_1 = class NewVehicleRe
         const buffer = Buffer.from(JSON.stringify(sw));
         await ctx.stub.putState(sw.id, buffer);
     }
-    async acceptSoftware(ctx, swId, justification) {
-        const sw = await this.getSoftwareDescription(ctx, swId);
+    async acceptSw(ctx, swId, justification) {
+        const sw = await this.getSwDescription(ctx, swId);
         if (sw.status !== 'REQUESTED') {
             throw new Error('The software ' + swId + ' is in the wrong status.  Expected REQUESTED got ' + sw.status);
         }
@@ -249,8 +248,8 @@ let NewVehicleRequestContract = NewVehicleRequestContract_1 = class NewVehicleRe
         const buffer = Buffer.from(JSON.stringify(sw));
         await ctx.stub.putState(swId, buffer);
     }
-    async rejectSoftware(ctx, swID, justification) {
-        const sw = await this.getSoftwareDescription(ctx, swID);
+    async rejectSw(ctx, swID, justification) {
+        const sw = await this.getSwDescription(ctx, swID);
         if (sw.status !== 'REQUESTED') {
             throw new Error('The software ' + swID + ' is in the wrong status.  Expected REQUESTED got ' + sw.status);
         }
@@ -259,7 +258,7 @@ let NewVehicleRequestContract = NewVehicleRequestContract_1 = class NewVehicleRe
         const buffer = Buffer.from(JSON.stringify(sw));
         await ctx.stub.putState(swID, buffer);
     }
-    async getSoftwareDescription(ctx, swId) {
+    async getSwDescription(ctx, swId) {
         const exists = await this.exists(ctx, swId);
         if (!exists) {
             throw new Error(`The software ${swId} does not exists`);
@@ -268,10 +267,13 @@ let NewVehicleRequestContract = NewVehicleRequestContract_1 = class NewVehicleRe
         const system = JSON.parse(buffer.toString());
         return system;
     }
-    async isSoftwareValid(ctx, id) {
-        return (await this.exists(ctx, id)) && (await this.getSoftwareDescription(ctx, id)).status == 'ACCEPTED';
+    async isSwValid(ctx, id) {
+        return (await this.exists(ctx, id)) && (await this.getSwDescription(ctx, id)).status == 'ACCEPTED';
     }
-    async listSoftware(ctx) {
+    async getSwStatus(ctx, id) {
+        return (await this.getSwDescription(ctx, id)).status;
+    }
+    async listSw(ctx) {
         const queryRegulator = {
             selector: {
                 id: { $regex: 'sw-.+' },
@@ -451,40 +453,40 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [fabric_contract_api_1.Context, String, String, String, String]),
     __metadata("design:returntype", Promise)
-], NewVehicleRequestContract.prototype, "sendNewSystemDescription", null);
+], NewVehicleRequestContract.prototype, "sendNewSysDescription", null);
 __decorate([
     fabric_contract_api_1.Transaction(),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [fabric_contract_api_1.Context, String, String]),
     __metadata("design:returntype", Promise)
-], NewVehicleRequestContract.prototype, "acceptSystem", null);
+], NewVehicleRequestContract.prototype, "acceptSys", null);
 __decorate([
     fabric_contract_api_1.Transaction(),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [fabric_contract_api_1.Context, String, String]),
     __metadata("design:returntype", Promise)
-], NewVehicleRequestContract.prototype, "rejectSystem", null);
+], NewVehicleRequestContract.prototype, "rejectSys", null);
 __decorate([
     fabric_contract_api_1.Transaction(false),
     fabric_contract_api_1.Returns('System'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [fabric_contract_api_1.Context, String]),
     __metadata("design:returntype", Promise)
-], NewVehicleRequestContract.prototype, "getSystemDescription", null);
+], NewVehicleRequestContract.prototype, "getSysDescription", null);
 __decorate([
     fabric_contract_api_1.Transaction(false),
     fabric_contract_api_1.Returns('boolean'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [fabric_contract_api_1.Context, String]),
     __metadata("design:returntype", Promise)
-], NewVehicleRequestContract.prototype, "isSystemValid", null);
+], NewVehicleRequestContract.prototype, "isSysValid", null);
 __decorate([
     fabric_contract_api_1.Transaction(false),
     fabric_contract_api_1.Returns('System[]'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [fabric_contract_api_1.Context]),
     __metadata("design:returntype", Promise)
-], NewVehicleRequestContract.prototype, "listSystem", null);
+], NewVehicleRequestContract.prototype, "listSys", null);
 __decorate([
     fabric_contract_api_1.Transaction(),
     __metadata("design:type", Function),
@@ -496,34 +498,41 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [fabric_contract_api_1.Context, String, String]),
     __metadata("design:returntype", Promise)
-], NewVehicleRequestContract.prototype, "acceptSoftware", null);
+], NewVehicleRequestContract.prototype, "acceptSw", null);
 __decorate([
     fabric_contract_api_1.Transaction(),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [fabric_contract_api_1.Context, String, String]),
     __metadata("design:returntype", Promise)
-], NewVehicleRequestContract.prototype, "rejectSoftware", null);
+], NewVehicleRequestContract.prototype, "rejectSw", null);
 __decorate([
     fabric_contract_api_1.Transaction(false),
     fabric_contract_api_1.Returns('Software'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [fabric_contract_api_1.Context, String]),
     __metadata("design:returntype", Promise)
-], NewVehicleRequestContract.prototype, "getSoftwareDescription", null);
+], NewVehicleRequestContract.prototype, "getSwDescription", null);
 __decorate([
     fabric_contract_api_1.Transaction(false),
     fabric_contract_api_1.Returns('boolean'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [fabric_contract_api_1.Context, String]),
     __metadata("design:returntype", Promise)
-], NewVehicleRequestContract.prototype, "isSoftwareValid", null);
+], NewVehicleRequestContract.prototype, "isSwValid", null);
+__decorate([
+    fabric_contract_api_1.Transaction(false),
+    fabric_contract_api_1.Returns('string'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [fabric_contract_api_1.Context, String]),
+    __metadata("design:returntype", Promise)
+], NewVehicleRequestContract.prototype, "getSwStatus", null);
 __decorate([
     fabric_contract_api_1.Transaction(false),
     fabric_contract_api_1.Returns('Software[]'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [fabric_contract_api_1.Context]),
     __metadata("design:returntype", Promise)
-], NewVehicleRequestContract.prototype, "listSoftware", null);
+], NewVehicleRequestContract.prototype, "listSw", null);
 NewVehicleRequestContract = NewVehicleRequestContract_1 = __decorate([
     fabric_contract_api_1.Info({ title: 'NewVehicleRequestContract', description: 'UpdateAd SmartContract' }),
     __metadata("design:paramtypes", [])

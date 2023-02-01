@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Response } from 'src/app/shared/models/response';
 import { AuthService } from '../auth.service';
 import { ToastrService } from 'ngx-toastr';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -47,46 +48,24 @@ export class ConnectorService {
     return [];
   }
 
-  newSoftware(id:string, nombre: string, descripcion:string):void{
+  newSoftware(id:string, nombre: string, descripcion:string):Observable<any>{
     const body = new HttpParams().set('id', id ).set('nombre', nombre).set('descripcion',descripcion);
-    this.http.post<any>('/sendNewSwDescription',
+    return this.http.post<any>('/newSoftware',
     body.toString(),{
       headers:{
         "Authorization": this.auth.getAuthorization(),
         'Content-Type': 'application/x-www-form-urlencoded'
-      }
-    }).subscribe({
-      next: data => {
-        this.toastr.success("Se creo correctamente el software.","Éxito",{
-          timeOut: 3000,
-        });
-      },  
-      error: error =>{
-        this.toastr.error("Se ha producido el siguiente error: " + error, "Error",{
-				  timeOut: 3000,
-			  });
       }
     });
   }
 
-  newSystem(id:string, nombre: string, descripcion:string, sw_included: string):void{
+  newSystem(id:string, nombre: string, descripcion:string, sw_included: string):Observable<any>{
     const body = new HttpParams().set('id', id ).set('nombre', nombre).set('descripcion',descripcion).set('sw_included',sw_included);
-    this.http.post<any>('/sendNewSwDescription',
+    return this.http.post<any>('/newSystem',
     body.toString(),{
       headers:{
         "Authorization": this.auth.getAuthorization(),
         'Content-Type': 'application/x-www-form-urlencoded'
-      }
-    }).subscribe({
-      next: data => {
-        this.toastr.success("Se creo correctamente el sistema.","Éxito",{
-          timeOut: 3000,
-        });
-      },  
-      error: error =>{
-        this.toastr.error("Se ha producido el siguiente error: " + error, "Error",{
-				  timeOut: 3000,
-			  });
       }
     });
   }

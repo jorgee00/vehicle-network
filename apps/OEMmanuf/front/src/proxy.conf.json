@@ -6,5 +6,18 @@
     "/listSoftware": {
       "target": "http://localhost:6000",
       "secure": false
+    },
+    "/listSystem": {
+      "target": "http://localhost:6000",
+      "secure": false
+    },
+    "/newSoftware":{
+      "target": "http://localhost:6000",
+      "secure": false
+    },
+    "/newSystem":{
+      "target": "http://localhost:6000",
+      "secure": false
     }
+    
   }

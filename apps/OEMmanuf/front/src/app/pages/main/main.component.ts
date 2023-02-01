@@ -10,32 +10,35 @@ import { Response } from 'src/app/shared/models/response';
 	templateUrl: './main.component.html',
 	styleUrls: ['./main.component.scss']
 })
-export class MainComponent implements OnInit{
+export class MainComponent implements OnInit {
 	header: Header = {
 		pageTitle: GlobalConstants.siteTitle,
 		leftIcon: "add"
 	};
 	sysInput: string = ""
 	systemSel: string[] = [];
-	id:string = "";
-	name:string = "";
-	description: string= "";
-	data:Response[] = [];
+	id: string = "";
+	name: string = "";
+	description: string = "";
+	data: Response[] = [];
 	constructor(
 		private toastr: ToastrService,
-		private connector: ConnectorService 
-	){};
-	
-	async ngOnInit(){
-		this.data = await this.connector.listSoftware();
-		this.data = this.data.concat(await this.connector.listSystem());
+		private connector: ConnectorService
+	) { };
+
+	async ngOnInit() {
+		await this.refresh();
+	}
+	async refresh() {
+		let newdata = await this.connector.listSoftware();
+		this.data = newdata.concat(await this.connector.listSystem());
 	}
 	create() {
 		document.getElementById("mainModal")?.classList.remove("hidden");
 		document.getElementById("selectModal")?.classList.remove("hidden");
 	};
 
-	resetForm():void {
+	resetForm(): void {
 		this.id = '';
 		this.name = '';
 		this.description = '';
@@ -60,56 +63,80 @@ export class MainComponent implements OnInit{
 	stopPropagation(event: any) {
 		event.stopPropagation()
 	}
-	addSystem():void {
+	addSystem(): void {
 		if (this.sysInput !== '' && !this.systemSel.includes(this.sysInput)) {
 			this.systemSel.push(this.sysInput);
 			this.sysInput = '';
 		}
 	}
-	rmSystem(elem:string):void {
+	rmSystem(elem: string): void {
 		if (elem !== '' && this.systemSel.indexOf(elem) > -1) {
-			this.systemSel.splice(this.systemSel.indexOf(elem),1);
+			this.systemSel.splice(this.systemSel.indexOf(elem), 1);
 		}
 	}
-	createSW():void{
+	async createSW() {
 		let error = '';
-		if(this.id == ''){
+		if (this.id == '') {
 			error += "Id ";
 		}
-		if(this.name == ''){
+		if (this.name == '') {
 			error += "Nombre ";
 		}
-		if(this.description == ''){
+		if (this.description == '') {
 			error += "Descripción ";
 		}
-		if(error == ''){
-			this.connector.newSoftware(this.id,this.name,this.description);
+		if (error == '') {
+			this.connector.newSoftware(this.id, this.name, this.description).subscribe({
+				next: data => {
+					this.toastr.success("Se creo correctamente el software.", "Éxito", {
+						timeOut: 3000,
+					});
+					this.refresh();
+				},
+				error: error => {
+					this.toastr.error("Se ha producido el siguiente error: " + error, "Error", {
+						timeOut: 3000,
+					});
+				}
+			});
 			this.hiddeModal();
-		}else{
-			this.toastr.error("Debe de rellenar los siguientes campos: " + error,"Error",{
+		} else {
+			this.toastr.error("Debe de rellenar los siguientes campos: " + error, "Error", {
 				timeOut: 3000,
 			});
 		}
 	}
-	createSys():void{
+	createSys() {
 		let error = '';
-		if(this.id == ''){
+		if (this.id == '') {
 			error += "Id ";
 		}
-		if(this.name == ''){
+		if (this.name == '') {
 			error += "Nombre ";
 		}
-		if(this.description == ''){
+		if (this.description == '') {
 			error += "Descripción ";
 		}
-		if(this.systemSel.length === 0){
+		if (this.systemSel.length === 0) {
 			error += "Sistemas ";
 		}
-		if(error == ''){
-			this.connector.newSystem(this.id,this.name,this.description,this.systemSel.toString());
+		if (error == '') {
+			this.connector.newSystem(this.id, this.name, this.description, this.systemSel.toString()).subscribe({
+				next: data => {
+					this.toastr.success("Se creo correctamente el sistema.", "Éxito", {
+						timeOut: 3000,
+					});
+					this.refresh();
+				},
+				error: error => {
+					this.toastr.error("Se ha producido el siguiente error: " + error, "Error", {
+						timeOut: 3000,
+					});
+				}
+			});
 			this.hiddeModal();
-		}else{
-			this.toastr.error("Debe de rellenar los siguientes campos: " + error,"Error",{
+		} else {
+			this.toastr.error("Debe de rellenar los siguientes campos: " + error, "Error", {
 				timeOut: 3000,
 			});
 		}
