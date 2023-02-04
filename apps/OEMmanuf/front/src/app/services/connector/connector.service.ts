@@ -16,7 +16,7 @@ export class ConnectorService {
     private toastr: ToastrService
   ) { }
   async listSoftware():Promise<Response[]>{
-    const data = await this.http.get<any>('/listSoftware',{
+    const data = await this.http.get<any>('api/listSoftware',{
       headers:{
         "Authorization": this.auth.getAuthorization()
       }
@@ -32,7 +32,7 @@ export class ConnectorService {
     return [];
   }
   async listSystem():Promise<Response[]>{
-    const data = await this.http.get<any>('/listSystem',{
+    const data = await this.http.get<any>('api/listSystem',{
       headers:{
         "Authorization": this.auth.getAuthorization()
       }
@@ -50,7 +50,7 @@ export class ConnectorService {
 
   newSoftware(id:string, nombre: string, descripcion:string):Observable<any>{
     const body = new HttpParams().set('id', id ).set('nombre', nombre).set('descripcion',descripcion);
-    return this.http.post<any>('/newSoftware',
+    return this.http.post<any>('api/newSoftware',
     body.toString(),{
       headers:{
         "Authorization": this.auth.getAuthorization(),
@@ -61,7 +61,7 @@ export class ConnectorService {
 
   newSystem(id:string, nombre: string, descripcion:string, sw_included: string):Observable<any>{
     const body = new HttpParams().set('id', id ).set('nombre', nombre).set('descripcion',descripcion).set('sw_included',sw_included);
-    return this.http.post<any>('/newSystem',
+    return this.http.post<any>('api/newSystem',
     body.toString(),{
       headers:{
         "Authorization": this.auth.getAuthorization(),

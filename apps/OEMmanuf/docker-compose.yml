@@ -6,8 +6,8 @@ services:
       ports:
         - 6000:6000
       volumes:
-        - ../../gateways/oemmanuf:/config/gateways/importerorg
-        - ../../wallets/oemmanuf:/config/wallets/importerorg
+        - ../../gateways/oemmanuf:/config/gateways/oemmanuf
+        - ../../wallets/oemmanuf:/config/wallets/oemmanuf
       tty: true
 
   oem-front:
@@ -15,6 +15,6 @@ services:
       container_name: oem-front
       ports:
         - 81:80
-      links:
+      depends_on:
         - oem-back
       tty: true
