@@ -94,6 +94,29 @@ services:
     networks:
       - trade
 
+  oem-back:
+      image: oemmanuf-oem-back
+      container_name: oemmanuf-oem-back
+      ports:
+        - 6000:6000
+      volumes:
+        - ../gateways/oemmanuf:/config/gateways/oemmanuf
+        - ../wallets/oemmanuf:/config/wallets/oemmanuf
+      tty: true
+      networks:
+        - trade
+
+  oem-front:
+      image: oemmanuf-oem-front
+      container_name: oemmanuf-oem-front
+      ports:
+        - 81:80
+      depends_on:
+        - oem-back
+      tty: true
+      networks:
+        - trade
+
   orderer.trade.com:
     extends:
       file:   base/docker-compose-base.yaml
@@ -133,3 +156,4 @@ services:
       service: peer0.inspectororg.trade.com
     networks:
       - trade
+  

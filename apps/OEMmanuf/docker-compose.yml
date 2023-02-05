@@ -1,4 +1,4 @@
-version: '3'
+version: '2'
 services:
   oem-back:
       build: ./back
@@ -9,6 +9,7 @@ services:
         - ../../gateways/oemmanuf:/config/gateways/oemmanuf
         - ../../wallets/oemmanuf:/config/wallets/oemmanuf
       tty: true
+      network_mode: host
 
   oem-front:
       build: ./front
@@ -18,3 +19,4 @@ services:
       depends_on:
         - oem-back
       tty: true
+      network_mode: host

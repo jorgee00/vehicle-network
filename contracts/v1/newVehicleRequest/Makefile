@@ -2,7 +2,7 @@
 ROOT_DIR=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 DIST_DIR=$(ROOT_DIR)/dist
 DOCKER_IMAGE="node:10.19-slim"
-CC_NAME="trade"
+CC_NAME="newVehicleRequest"
 CC_LANG="node"
 
 BUILD_CMD=npm install && npm run build
