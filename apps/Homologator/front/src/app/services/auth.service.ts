@@ -19,7 +19,9 @@ export class AuthService {
   getToken():any{
     return jwt_decode(this.cookie.get('bearer'));
   }
-
+  getAuthorization(){
+    return "Bearer " + this.cookie.get('bearer');
+  }
   logout(){
     this.cookie.delete('bearer');
     this.router.navigate(['/login']);

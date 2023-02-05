@@ -116,7 +116,28 @@ services:
       tty: true
       networks:
         - trade
+  homologator-back:
+      image: homologator-homologator-back
+      container_name: homologator-back
+      ports:
+        - 6001:6000
+      volumes:
+        - ../gateways/homologatororg:/config/gateways/homologatororg
+        - ../wallets/homologatororg:/config/wallets/homologatororg
+      tty: true
+      networks:
+        - trade
 
+  homologator-front:
+      image: homologator-homologator-front
+      container_name: homologator-front
+      ports:
+        - 82:80
+      links:
+        - homologator-back
+      tty: true
+      networks:
+        - trade
   orderer.trade.com:
     extends:
       file:   base/docker-compose-base.yaml

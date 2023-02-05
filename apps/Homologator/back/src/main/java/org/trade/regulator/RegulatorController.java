@@ -33,190 +33,162 @@ import org.springframework.web.bind.annotation.RequestMethod;
 @RestController
 public class RegulatorController {
 
-        @RequestMapping("/")
-        public String index() {
-                return "<h1>You have reached the OEM Manufacturer Organization Portal!</h1>";
-        }
+		@RequestMapping("/")
+		public String index() {
+				return "<h1>You have reached the OEM Manufacturer Organization Portal!</h1>";
+		}
 
-        @Autowired
-        private AuthenticationManager authenticationManager;
+		@Autowired
+		private AuthenticationManager authenticationManager;
 
-        @Autowired
-        private SecurityUtils securityUtils;
+		@Autowired
+		private SecurityUtils securityUtils;
 
-        @Autowired
-        private InMemoryUserDetailsManager userDetailsService;
+		@Autowired
+		private InMemoryUserDetailsManager userDetailsService;
 
-        @Value("${connectionProfilesBaseDir}")
-        private String connectionProfilesBaseDir;
+		@Value("${connectionProfilesBaseDir}")
+		private String connectionProfilesBaseDir;
 
-        @Value("${connectionProfileJson}")
-        private String connectionProfileJson;
+		@Value("${connectionProfileJson}")
+		private String connectionProfileJson;
 
-        @Value("${walletsBaseDir}")
-        private String walletsBaseDir;
+		@Value("${walletsBaseDir}")
+		private String walletsBaseDir;
 
-        @PostConstruct
-        public void createDefaultAdminUser() {
-                userDetailsService.createUser(User.withUsername("admin").password(new BCryptPasswordEncoder().encode("adminpw")).
-                                                roles(SecurityUtils.registrarRole).build());
+		@PostConstruct
+		public void createDefaultAdminUser() {
+			userDetailsService.createUser(User.withUsername("admin").password(new BCryptPasswordEncoder().encode("adminpw")).
+											roles(SecurityUtils.registrarRole).build());
 
-                // Also set Fabric properties
-                FabricNetworkUtils.connectionProfilesBaseDir = connectionProfilesBaseDir;
-                FabricNetworkUtils.connectionProfileJson = connectionProfileJson;
-                FabricIdentityUtils.walletsBaseDir = walletsBaseDir;
-        }
+			// Also set Fabric properties
+			FabricNetworkUtils.connectionProfilesBaseDir = connectionProfilesBaseDir;
+			FabricNetworkUtils.connectionProfileJson = connectionProfileJson;
+			FabricIdentityUtils.walletsBaseDir = walletsBaseDir;
+		}
 
-        @RequestMapping(value = "/register", method = RequestMethod.POST)
-        public ResponseEntity<String> register(String registrarUser, String registrarPassword, String username, String password, String role) throws Exception {
-                role = role.toUpperCase();
-                try {
-                        Authentication authResult = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(registrarUser, registrarPassword));
-                        if (!SecurityUtils.isRegistrar(authResult)) {
-                                throw new BadCredentialsException(username + " is not a registrar");
-                        }
-                } catch(AuthenticationException ae) {
-                        ae.printStackTrace();
-                        return new ResponseEntity<String>(ae.getMessage(), HttpStatus.FORBIDDEN);
-                }
-                if (!SecurityUtils.recognizedRole(role.toUpperCase())) {
-                        return new ResponseEntity<String>(role + " is not a recognized role", HttpStatus.BAD_REQUEST);
-                }
+		@RequestMapping(value = "/register", method = RequestMethod.POST)
+		public ResponseEntity<String> register(String registrarUser, String registrarPassword, String username, String password, String role) throws Exception {
+			role = role.toUpperCase();
+			try {
+				Authentication authResult = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(registrarUser, registrarPassword));
+				if (!SecurityUtils.isRegistrar(authResult)) {
+						throw new BadCredentialsException(username + " is not a registrar");
+				}
+			} catch(AuthenticationException ae) {
+				ae.printStackTrace();
+				return new ResponseEntity<String>(ae.getMessage(), HttpStatus.FORBIDDEN);
+			}
+			if (!SecurityUtils.recognizedRole(role.toUpperCase())) {
+				return new ResponseEntity<String>(role + " is not a recognized role", HttpStatus.BAD_REQUEST);
+			}
 
-                if (!FabricIdentityUtils.enrollRegistrar(FabricNetworkUtils.regulatorOrgMsp)) {
-                        return new ResponseEntity<String>("Unable to enroll registrar", HttpStatus.INTERNAL_SERVER_ERROR);
-                }
+			if (!FabricIdentityUtils.enrollRegistrar(FabricNetworkUtils.regulatorOrgMsp)) {
+				return new ResponseEntity<String>("Unable to enroll registrar", HttpStatus.INTERNAL_SERVER_ERROR);
+			}
 
-                if (!userDetailsService.userExists(username)) {
-                        if (!FabricIdentityUtils.registerAndEnrollUser(FabricNetworkUtils.regulatorOrgMsp, username, role)) {
-                                return new ResponseEntity<String>("Unable to register user " + username, HttpStatus.INTERNAL_SERVER_ERROR);
-                        }
-                        userDetailsService.createUser(User.withUsername(username).password(new BCryptPasswordEncoder().encode(password)).
-                                                roles(role.toUpperCase()).build());
-                }
+			if (!userDetailsService.userExists(username)) {
+				if (!FabricIdentityUtils.registerAndEnrollUser(FabricNetworkUtils.regulatorOrgMsp, username, role)) {
+					return new ResponseEntity<String>("Unable to register user " + username, HttpStatus.INTERNAL_SERVER_ERROR);
+				}
+				userDetailsService.createUser(User.withUsername(username).password(new BCryptPasswordEncoder().encode(password)).
+										roles(role.toUpperCase()).build());
+			}
 
-                JSONObject registrationObj = new JSONObject();
-                registrationObj.put("username", username);
-                JSONArray roles = new JSONArray();
-                roles.put(role);
-                registrationObj.put("roles", roles);
-                return ResponseEntity.ok(registrationObj.toString());
-        }
+			JSONObject registrationObj = new JSONObject();
+			registrationObj.put("username", username);
+			JSONArray roles = new JSONArray();
+			roles.put(role);
+			registrationObj.put("roles", roles);
+			return ResponseEntity.ok(registrationObj.toString());
+		}
 
-        @RequestMapping(value = "/login", method = RequestMethod.POST)
-        public ResponseEntity<String> login(String username, String password, HttpServletResponse response) throws Exception {
-                try {
-                        System.out.println(new UsernamePasswordAuthenticationToken(username, password));
-                        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-                } catch(AuthenticationException ae) {
-                        ae.printStackTrace();
-                        return new ResponseEntity<String>(ae.getMessage(), HttpStatus.FORBIDDEN);
-                }
-                // Also check Fabric wallet for presence of user credentials
-                if (FabricIdentityUtils.loadUserFromWallet(FabricNetworkUtils.regulatorOrgMsp, username) == null) {
-                        return new ResponseEntity<String>("Identity for " + username + " not found in wallet", HttpStatus.FORBIDDEN);
-                }
+		@RequestMapping(value = "/login", method = RequestMethod.POST)
+		public ResponseEntity<String> login(String username, String password, HttpServletResponse response) throws Exception {
+			try {
+				System.out.println(new UsernamePasswordAuthenticationToken(username, password));
+				authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+			} catch(AuthenticationException ae) {
+				ae.printStackTrace();
+				return new ResponseEntity<String>(ae.getMessage(), HttpStatus.FORBIDDEN);
+			}
+			// Also check Fabric wallet for presence of user credentials
+			if (FabricIdentityUtils.loadUserFromWallet(FabricNetworkUtils.regulatorOrgMsp, username) == null) {
+				return new ResponseEntity<String>("Identity for " + username + " not found in wallet", HttpStatus.FORBIDDEN);
+			}
 
-                final UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                final String token = securityUtils.generateToken(userDetails);
-                JSONObject tokenObj = new JSONObject();
+			final UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+			final String token = securityUtils.generateToken(userDetails);
+			JSONObject tokenObj = new JSONObject();
+			response.addHeader("Set-Cookie", "bearer=" + token + "; SameSite=strict; Max-Age=604800;Secure");
+			tokenObj.put("token", token);
+			return ResponseEntity.ok(tokenObj.toString());
+		}
 
-                Cookie cookie = new Cookie("bearer",token);
+		private String errorObj(String errorMessage) {
+			JSONObject errObj = new JSONObject();
+			errObj.put("result", false);
+			errObj.put("error", errorMessage);
+			return errObj.toString();
+		}
+		@RequestMapping(value = "/listSoftware", method = RequestMethod.GET)
+		public String listSoftware(@RequestHeader Map<String, String> headers) {
+			String username = securityUtils.getUserNameFromTokenHeaders(headers);
+			if (username == null) {
+					return errorObj("Unable to get username from headers");
+			}
+			return FabricNetworkUtils.invokeContract(username, FabricNetworkUtils.tradeChannel, FabricNetworkUtils.vehicleContractId,
+												true, "listSw");
+		}
 
-                // expires in 7 days
-                cookie.setMaxAge(7 * 24 * 60 * 60);
+		@RequestMapping(value = "/acceptSoftware", method = RequestMethod.POST)
+		public String acceptSoftware(@RequestHeader Map<String, String> headers, String id, String justification) {
+			String username = securityUtils.getUserNameFromTokenHeaders(headers);
+			if (username == null) {
+				return errorObj("Unable to get username from headers");
+			}
+			return FabricNetworkUtils.invokeContract(username, FabricNetworkUtils.tradeChannel, FabricNetworkUtils.vehicleContractId,
+												true, "acceptSw", id, justification);
+		}
 
-                // optional properties
-                cookie.setSecure(true);
-                cookie.setPath("/");
-                response.addCookie(cookie);
-                tokenObj.put("token", token);
-                return ResponseEntity.ok(tokenObj.toString());
-        }
+		@RequestMapping(value = "/rejectSoftware", method = RequestMethod.POST)
+		public String rejectSoftware(@RequestHeader Map<String, String> headers, String id, String justification) {
+			String username = securityUtils.getUserNameFromTokenHeaders(headers);
+			if (username == null) {
+				return errorObj("Unable to get username from headers");
+			}
+			return FabricNetworkUtils.invokeContract(username, FabricNetworkUtils.tradeChannel, FabricNetworkUtils.vehicleContractId,
+												true, "rejectSw", id, justification);
+		}
 
-        private String errorObj(String errorMessage) {
-                JSONObject errObj = new JSONObject();
-                errObj.put("result", false);
-                errObj.put("error", errorMessage);
-                return errObj.toString();
-        }
-        @RequestMapping(value = "/newSoftware", method = RequestMethod.POST)
-        public String newSoftware(@RequestHeader Map<String, String> headers, String tradeId, String elId, String expirationDate) {
-                String username = securityUtils.getUserNameFromTokenHeaders(headers);
-                if (username == null) {
-                        return errorObj("Unable to get username from headers");
-                }
-                return FabricNetworkUtils.invokeContract(username, FabricNetworkUtils.tradeChannel, FabricNetworkUtils.elContractId,
-                                                    false, "issueEL", tradeId, elId, expirationDate);
-        }
-        
-        @RequestMapping(value = "/getSoftware", method = RequestMethod.GET)
-        public String getTrade(@RequestHeader Map<String, String> headers, String tradeId) {
-                String username = securityUtils.getUserNameFromTokenHeaders(headers);
-                if (username == null) {
-                        return errorObj("Unable to get username from headers");
-                }
-                return FabricNetworkUtils.invokeContract(username, FabricNetworkUtils.tradeChannel, FabricNetworkUtils.tradeContractId,
-                                                    true, "getTrade", tradeId);
-        }
-        @RequestMapping(value = "/getTradeStatus", method = RequestMethod.GET)
-        public String getTradeStatus(@RequestHeader Map<String, String> headers, String tradeId) {
-                String username = securityUtils.getUserNameFromTokenHeaders(headers);
-                if (username == null) {
-                        return errorObj("Unable to get username from headers");
-                }
-                return FabricNetworkUtils.invokeContract(username, FabricNetworkUtils.tradeChannel, FabricNetworkUtils.tradeContractId,
-                                                    true, "getTradeStatus", tradeId);
-        }
+		@RequestMapping(value = "/listSystem", method = RequestMethod.GET)
+		public String listSystem(@RequestHeader Map<String, String> headers) {
+			String username = securityUtils.getUserNameFromTokenHeaders(headers);
+			if (username == null) {
+				return errorObj("Unable to get username from headers");
+			}
+			return FabricNetworkUtils.invokeContract(username, FabricNetworkUtils.tradeChannel, FabricNetworkUtils.vehicleContractId,
+												true, "listSys");
+		}
 
-        @RequestMapping(value = "/getEL", method = RequestMethod.GET)
-        public String getEL(@RequestHeader Map<String, String> headers, String tradeId) {
-                String username = securityUtils.getUserNameFromTokenHeaders(headers);
-                if (username == null) {
-                        return errorObj("Unable to get username from headers");
-                }
-                return FabricNetworkUtils.invokeContract(username, FabricNetworkUtils.tradeChannel, FabricNetworkUtils.elContractId,
-                                                    true, "getEL", tradeId);
-        }
+		@RequestMapping(value = "/acceptSystem", method = RequestMethod.POST)
+		public String acceptSystem(@RequestHeader Map<String, String> headers, String id, String justification) {
+			String username = securityUtils.getUserNameFromTokenHeaders(headers);
+			if (username == null) {
+				return errorObj("Unable to get username from headers");
+			}
+			return FabricNetworkUtils.invokeContract(username, FabricNetworkUtils.tradeChannel, FabricNetworkUtils.vehicleContractId,
+												true, "acceptSys", id, justification);
+		}
 
-        @RequestMapping(value = "/getELStatus", method = RequestMethod.GET)
-        public String getELStatus(@RequestHeader Map<String, String> headers, String tradeId) {
-                String username = securityUtils.getUserNameFromTokenHeaders(headers);
-                if (username == null) {
-                        return errorObj("Unable to get username from headers");
-                }
-                return FabricNetworkUtils.invokeContract(username, FabricNetworkUtils.tradeChannel, FabricNetworkUtils.elContractId,
-                                                    true, "getELStatus", tradeId);
-        }
+		@RequestMapping(value = "/rejectSystem", method = RequestMethod.POST)
+		public String rejectSystem(@RequestHeader Map<String, String> headers, String id, String justification) {
+			String username = securityUtils.getUserNameFromTokenHeaders(headers);
+			if (username == null) {
+				return errorObj("Unable to get username from headers");
+			}
+			return FabricNetworkUtils.invokeContract(username, FabricNetworkUtils.tradeChannel, FabricNetworkUtils.vehicleContractId,
+												true, "rejectSys", id, justification);
+		}
 
-        @RequestMapping(value = "/listS", method = RequestMethod.GET)
-        public String listTrades(@RequestHeader Map<String, String> headers) {
-                String username = securityUtils.getUserNameFromTokenHeaders(headers);
-                if (username == null) {
-                        return errorObj("Unable to get username from headers");
-                }
-                return FabricNetworkUtils.invokeContract(username, FabricNetworkUtils.tradeChannel, FabricNetworkUtils.tradeContractId,
-                                                    true, "listTrade");
-        }
-
-        @RequestMapping(value = "/getTradesByRange", method = RequestMethod.GET)
-        public String getTradesByRange(@RequestHeader Map<String, String> headers, String fromTradeId, String toTradeId) {
-                String username = securityUtils.getUserNameFromTokenHeaders(headers);
-                if (username == null) {
-                        return errorObj("Unable to get username from headers");
-                }
-                return FabricNetworkUtils.invokeContract(username, FabricNetworkUtils.tradeChannel, FabricNetworkUtils.tradeContractId,
-                                                    true, "getTradesByRange", fromTradeId, toTradeId);
-        }
-        /*
-        @RequestMapping(value = "/getTradeHistory", method = RequestMethod.GET)
-        public String getTradeHistory(@RequestHeader Map<String, String> headers, String tradeId) {
-                String username = securityUtils.getUserNameFromTokenHeaders(headers);
-                if (username == null) {
-                        return errorObj("Unable to get username from headers");
-                }
-                return FabricNetworkUtils.invokeContract(username, FabricNetworkUtils.tradeChannel, FabricNetworkUtils.tradeContractId,
-                                                    true, "getTradeHistory", tradeId);
-        }
-        */
 }

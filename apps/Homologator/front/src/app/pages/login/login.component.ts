@@ -23,8 +23,7 @@ export class LoginComponent {
   }
   onClick(){
     const body = new HttpParams().set('username', this.userForm.get('username')?.value).set('password', this.userForm.get('password')?.value);
-    console.log(body)
-    this.http.post("/login",body.toString(),
+    this.http.post("api/login",body.toString(),
     {
       headers: new HttpHeaders()
         .set('Content-Type', 'application/x-www-form-urlencoded')

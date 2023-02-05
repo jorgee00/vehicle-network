@@ -4,7 +4,7 @@ services:
       build: ./back
       container_name: homologator-back
       ports:
-        - 6000:6000
+        - 6001:6000
       volumes:
         - ../../gateways/homologatororg:/config/gateways/homologatororg
         - ../../wallets/homologatororg:/config/wallets/homologatororg
@@ -14,7 +14,7 @@ services:
       build: ./front
       container_name: homologator-front
       ports:
-        - 81:80
+        - 82:80
       links:
         - homologator-back
       tty: true
