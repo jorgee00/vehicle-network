@@ -121,7 +121,6 @@ public class RegulatorController {
                 final String token = securityUtils.generateToken(userDetails);
                 JSONObject tokenObj = new JSONObject();
 
-                response.addHeader("Set-Cookie", "bearer=" + token + "; SameSite=strict; Max-Age=604800;Secure");
 		tokenObj.put("token", token);
                 return ResponseEntity.ok(tokenObj.toString());
         }

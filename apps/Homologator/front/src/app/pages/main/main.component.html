@@ -23,7 +23,7 @@
 </div>
 <div id="mainModal" class="modal hidden" (click)="hiddeModal()">
     <div class="innerModal hidden" id="chooseOption" (click)="stopPropagation($event)">
-        <h2>Creación de un nuevo software</h2>
+        <h2>Revisión de una pieza</h2>
         <div class="horizontal">
             <h3>Identificador:</h3>
             <h4>{{id}}</h4>
@@ -31,6 +31,10 @@
         <div class="horizontal">
             <h3>Nombre:</h3>
             <h4>{{name}}</h4>
+        </div>
+        <div class="horizontal" *ngIf="type==='system'">
+            <h3>Software incluido:</h3>
+            <h4>{{swIncluded}}</h4>
         </div>
         <h3>Descripcion:</h3>
         <p>{{description}}</p>

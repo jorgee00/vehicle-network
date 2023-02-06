@@ -19,6 +19,7 @@ export class MainComponent implements OnInit{
   description:string = '';
   reason:string = '';
   type:string = '';
+  swIncluded:string = '';
   data: Response[] = [];
   
   constructor(
@@ -47,17 +48,25 @@ export class MainComponent implements OnInit{
   stopPropagation(event: any) {
     event.stopPropagation()
   }
+
   openElem(elem:any){
-    document.getElementById("mainModal")?.classList.remove("hidden");
-    document.getElementById("chooseOption")?.classList.remove("hidden");
-    this.id = elem.id;
-    this.name = elem.name;
-    this.description = elem.description;
-    this.type = elem.type;
+    if(elem.status == 'REQUESTED'){
+      document.getElementById("mainModal")?.classList.remove("hidden");
+      document.getElementById("chooseOption")?.classList.remove("hidden");
+      this.id = elem.id;
+      this.name = elem.nombre;
+      this.description = elem.descripcion;
+      this.type = elem.id.startsWith('sys-')?"system":"software";
+      if(this.type === 'system'){
+        const elemt = this.data.find(iter =>{ return iter.id === this.id})?.sw_included;
+        this.swIncluded =  elemt != undefined ? elemt :'';
+      }
+    }
   }
   accept(){
     if(this.reason != ''){
       if(this.type.toLowerCase() === 'software'){
+        console.log(this.id + this.reason);
         this.connector.acceptSoftware(this.id,this.reason).subscribe({
           next: data => {
             this.toastr.success('Se acepto correctamente el software.', "Éxito", {

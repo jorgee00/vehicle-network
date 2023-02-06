@@ -12,6 +12,10 @@ export class AuthService {
     private router: Router
   ){};
 
+  setToken(token:any):void{
+    this.cookie.set('bearer',token.token);
+  }
+
   isLoggedIn(){
     return this.cookie.check('bearer');
   }

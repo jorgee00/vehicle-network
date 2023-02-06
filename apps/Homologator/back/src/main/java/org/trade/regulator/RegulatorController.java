@@ -120,7 +120,6 @@ public class RegulatorController {
 			final UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 			final String token = securityUtils.generateToken(userDetails);
 			JSONObject tokenObj = new JSONObject();
-			response.addHeader("Set-Cookie", "bearer=" + token + "; SameSite=strict; Max-Age=604800;Secure");
 			tokenObj.put("token", token);
 			return ResponseEntity.ok(tokenObj.toString());
 		}
@@ -148,7 +147,7 @@ public class RegulatorController {
 				return errorObj("Unable to get username from headers");
 			}
 			return FabricNetworkUtils.invokeContract(username, FabricNetworkUtils.tradeChannel, FabricNetworkUtils.vehicleContractId,
-												true, "acceptSw", id, justification);
+												false, "acceptSw", id, justification);
 		}
 
 		@RequestMapping(value = "/rejectSoftware", method = RequestMethod.POST)
@@ -158,7 +157,7 @@ public class RegulatorController {
 				return errorObj("Unable to get username from headers");
 			}
 			return FabricNetworkUtils.invokeContract(username, FabricNetworkUtils.tradeChannel, FabricNetworkUtils.vehicleContractId,
-												true, "rejectSw", id, justification);
+												false, "rejectSw", id, justification);
 		}
 
 		@RequestMapping(value = "/listSystem", method = RequestMethod.GET)
@@ -178,7 +177,7 @@ public class RegulatorController {
 				return errorObj("Unable to get username from headers");
 			}
 			return FabricNetworkUtils.invokeContract(username, FabricNetworkUtils.tradeChannel, FabricNetworkUtils.vehicleContractId,
-												true, "acceptSys", id, justification);
+												false, "acceptSys", id, justification);
 		}
 
 		@RequestMapping(value = "/rejectSystem", method = RequestMethod.POST)
@@ -188,7 +187,7 @@ public class RegulatorController {
 				return errorObj("Unable to get username from headers");
 			}
 			return FabricNetworkUtils.invokeContract(username, FabricNetworkUtils.tradeChannel, FabricNetworkUtils.vehicleContractId,
-												true, "rejectSys", id, justification);
+												false, "rejectSys", id, justification);
 		}
 
 }

@@ -1,5 +1,5 @@
 <div class="page">
-    <form [formGroup]="userForm">
+    <form [formGroup]="userForm" (keydown.enter)="onClick()">
         <h1>{{siteTitle}}</h1>
         <input type="text" placeholder="Usuario" name="username" formControlName="username">
         <input type="password" placeholder="Contraseña" name="password" formControlName="password">

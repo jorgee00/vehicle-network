@@ -4,5 +4,5 @@ export interface Response{
     descripcion:string,
     status:string,
     type?:string,
-    sw_included?:string[]
+    sw_included?:string
 }

@@ -3,6 +3,7 @@ import { FormGroup ,FormBuilder } from '@angular/forms';
 import { GlobalConstants } from 'src/app/shared/global-constants';
 import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { AuthService } from 'src/app/services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -15,6 +16,7 @@ export class LoginComponent {
   constructor(
     private http: HttpClient,
     private fb: FormBuilder,
+    private auth: AuthService,
     private router: Router){
     this.userForm = this.fb.group({
       username: '',
@@ -28,7 +30,8 @@ export class LoginComponent {
       headers: new HttpHeaders()
         .set('Content-Type', 'application/x-www-form-urlencoded')
     }).subscribe({
-      next: data => {
+      next: data=> {
+        this.auth.setToken(data);
         this.router.navigate(['/home']);
       },  
       error: error =>{

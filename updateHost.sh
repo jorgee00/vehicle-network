@@ -10,6 +10,9 @@ echo 127.0.0.1 ca.vehiclemanuf.trade.com >> /etc/hosts
 echo 127.0.0.1 ca.homologatororg.trade.com >> /etc/hosts
 echo 127.0.0.1 ca.oemmanuf.trade.com >> /etc/hosts
 echo 127.0.0.1 ca.inspectororg.trade.com >> /etc/hosts
+echo "" >> /etc/hosts
+echo 127.0.0.1 oemmanuf.com >> /etc/hosts
+echo 127.0.0.1 homologator.com >> /etc/hosts
 
 cat /etc/hosts
 
