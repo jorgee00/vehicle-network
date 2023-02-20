@@ -25,7 +25,7 @@ export declare class NewVehicleRequestContract extends Contract {
     /**
      * Functions related to systems
      */
-    sendNewSysDescription(ctx: Context, id: string, descripcion: string, nombre: string, sw_included: string): Promise<void>;
+    sendNewSysDescription(ctx: Context, id: string, nombre: string, descripcion: string, sw_included: string): Promise<void>;
     acceptSys(ctx: Context, systemId: string, justification: string): Promise<void>;
     rejectSys(ctx: Context, systemID: string, justification: string): Promise<void>;
     getSysDescription(ctx: Context, systemId: string): Promise<System>;

@@ -153,7 +153,7 @@ export class NewVehicleRequestContract extends Contract {
 	 * Functions related to systems 
 	 */
 	@Transaction()
-	public async sendNewSysDescription(ctx: Context, id:string, descripcion:string, nombre: string, sw_included: string): Promise<void> {
+	public async sendNewSysDescription(ctx: Context, id:string, nombre: string, descripcion:string, sw_included: string): Promise<void> {
 		const exists = await this.exists(ctx, "sys-" + id);
 		if (exists) {
 			throw new Error(`The trade sys-${id} already exists`);
@@ -183,7 +183,11 @@ export class NewVehicleRequestContract extends Contract {
 		if (system.status !== 'REQUESTED') {
 			throw new Error('The system ' + systemId + ' is in the wrong status.  Expected REQUESTED got ' + system.status);
 		}
-		system.status = 'ACCEPTED';
+		if(this.isSysValid(ctx,systemId)){
+			system.status = 'ACCEPTED';
+		}else{
+			system.status = 'REJECTED';
+		}
 		system.justification=justification;
 		const buffer = Buffer.from(JSON.stringify(system));
 		await ctx.stub.putState(systemId, buffer);

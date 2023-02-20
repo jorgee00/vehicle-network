@@ -25,7 +25,7 @@ public class FabricNetworkUtils {
 
     public static String tradeChannel = "tradechannel";
 
-    public static String tradeContractId = "new_vehicle_request";
+    public static String tradeContractId = "test";
 
     public static String connectionProfilesBaseDir = "";
     public static String connectionProfileJson = "";

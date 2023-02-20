@@ -130,7 +130,7 @@ let NewVehicleRequestContract = NewVehicleRequestContract_1 = class NewVehicleRe
     /**
      * Functions related to systems
      */
-    async sendNewSysDescription(ctx, id, descripcion, nombre, sw_included) {
+    async sendNewSysDescription(ctx, id, nombre, descripcion, sw_included) {
         const exists = await this.exists(ctx, "sys-" + id);
         if (exists) {
             throw new Error(`The trade sys-${id} already exists`);
@@ -155,7 +155,12 @@ let NewVehicleRequestContract = NewVehicleRequestContract_1 = class NewVehicleRe
         if (system.status !== 'REQUESTED') {
             throw new Error('The system ' + systemId + ' is in the wrong status.  Expected REQUESTED got ' + system.status);
         }
-        system.status = 'ACCEPTED';
+        if (this.isSysValid(ctx, systemId)) {
+            system.status = 'ACCEPTED';
+        }
+        else {
+            system.status = 'REJECTED';
+        }
         system.justification = justification;
         const buffer = Buffer.from(JSON.stringify(system));
         await ctx.stub.putState(systemId, buffer);
