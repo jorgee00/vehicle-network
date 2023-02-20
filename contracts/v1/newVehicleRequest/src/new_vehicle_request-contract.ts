@@ -183,7 +183,7 @@ export class NewVehicleRequestContract extends Contract {
 		if (system.status !== 'REQUESTED') {
 			throw new Error('The system ' + systemId + ' is in the wrong status.  Expected REQUESTED got ' + system.status);
 		}
-		if(this.isSysValid(ctx,systemId)){
+		if(await this.isSysValid(ctx,systemId)){
 			system.status = 'ACCEPTED';
 		}else{
 			system.status = 'REJECTED';
